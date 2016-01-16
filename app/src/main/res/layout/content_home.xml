@@ -17,12 +17,15 @@
         android:text="@string/kidnapbtn"
         android:id="@+id/btnKidnap"
         style="@style/HomeBtn"
+        android:background="@drawable/home_buttons"
+        android:onClick="startRealtimeTrack"
         android:layout_centerHorizontal="true"
          />
     <Button
         style="@style/HomeBtn"
         android:text="@string/robberybtn"
         android:id="@+id/btnRobbery"
+        android:background="@drawable/home_buttons"
         android:layout_below="@+id/btnKidnap"
         android:layout_centerHorizontal="true"
         />
@@ -31,6 +34,7 @@
         style="@style/HomeBtn"
         android:text="@string/evidencebtn"
         android:layout_below="@+id/btnRobbery"
+        android:background="@drawable/home_buttons"
         android:id="@+id/btnEvidence"
         android:layout_centerHorizontal="true"
         />
