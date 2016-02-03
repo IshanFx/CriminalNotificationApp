@@ -10,5 +10,6 @@ public class SMSManager {
     public void sendSMS(String Details){
         SmsManager smsManager = SmsManager.getDefault();
        // smsManager.sendTextMessage("0716097337", null, Details, null, null);
+
     }
 }

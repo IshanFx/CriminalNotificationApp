@@ -1,4 +1,8 @@
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/normalButton"/>
-    <corners android:radius="20dip"/>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle"
+
+    >
+    <solid android:color="@color/normalButton" />
+    <corners
+        />
 </shape>

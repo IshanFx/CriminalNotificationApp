@@ -10,13 +10,17 @@
     <string name="guide_settings">Guide</string>
     <string name="history_settings">History</string>
     <string name="friend_settings">Friends</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="logout_setting">Logout</string>
+
+    <string name="title_activity_login">Protect ME -Log In</string>
     <string name="picturebtn">Picture</string>
     <string name="videobtn">Video</string>
-
+    <string name="recordstartbtn">Start</string>
+    <string name="recordstopbtn">Stop</string>
+    <string name="recorduploadbtn">Upload</string>
     <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
+    <string name="prompt_email">User Name</string>
+    <string name="prompt_password">Password</string>
     <string name="action_sign_in">Log In</string>
     <string name="action_sign_in_short">User LogIn</string>
     <string name="error_invalid_email">This email address is invalid</string>
@@ -27,6 +31,10 @@
         completions."
     </string>
     <string name="title_activity_settings">Settings</string>
+
+
+        <string name="parse_app_id">D6x8K7StgtiGA2pmA2v3MkB4fJ1wpbZUBV4HCbbB</string>
+        <string name="parse_client_key">bFy7KDqZ7ObW4O1sou1Yaq7NbuJkyMoSNPIZvdQO</string>
 
     <!-- Strings related to Settings -->
 

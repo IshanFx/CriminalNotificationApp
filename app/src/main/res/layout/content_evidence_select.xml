@@ -17,15 +17,56 @@
         android:layout_height="wrap_content"
         android:text="@string/picturebtn"
         android:id="@+id/button"
+        android:onClick="startcapture"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="104dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/videobtn"
         android:id="@+id/button2"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:onClick="startVideo"
+        android:layout_alignTop="@+id/button"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:id="@+id/imageView1"
+        android:layout_below="@+id/button2"
+         />
+
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/recordstartbtn"
+        android:id="@+id/btnStartRecord"
+        android:onClick="startVoiceRecord"
+        android:layout_below="@+id/imageView1"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/recordstopbtn"
+        android:id="@+id/btnStopRecord"
+        android:onClick="stopVoiceRecord"
+        android:layout_alignBaseline="@+id/btnStartRecord"
+        android:layout_toEndOf="@+id/btnStartRecord"
+        android:layout_toRightOf="@+id/btnStartRecord"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/recorduploadbtn"
+        android:id="@+id/btnUploadRecord"
+        android:onClick="uploadVoiceRecord"
+        android:layout_alignBaseline="@+id/btnStartRecord"
+        android:layout_toEndOf="@+id/btnStopRecord"
+        android:layout_toRightOf="@+id/btnStopRecord"
+        />
 </RelativeLayout>
