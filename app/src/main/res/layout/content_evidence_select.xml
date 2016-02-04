@@ -69,4 +69,11 @@
         android:layout_toEndOf="@+id/btnStopRecord"
         android:layout_toRightOf="@+id/btnStopRecord"
         />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/uploadProgress"
+        android:layout_below="@+id/btnStartRecord"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
