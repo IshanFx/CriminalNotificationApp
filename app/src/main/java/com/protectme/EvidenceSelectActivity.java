@@ -59,13 +59,14 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     public static final int MEDIA_TYPE_VIDEO = 2;
     public static final int MEDIA_TYPE_AUDIO = 3;
 
+    public static String audioName = "";
     Button start, stop, uploadrecord;
     private MediaRecorder myAudioRecorder;
     private static String outputFile = null;
     ProgressBar uploadProgress;
     String selectedImagePath;
 
-    private Uri fileUri;
+    private static Uri fileUri;
     ImageView captureImageView;
     private Bitmap bitmap;
     private String encode_string;
@@ -175,7 +176,9 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         }
     }
 
-
+    /*
+    * Video Recording Listner
+    * */
     public void startVideo(View view) {
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         fileUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO); // create a file to save the image
@@ -209,16 +212,14 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         if (type == MEDIA_TYPE_IMAGE) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_" + timeStamp + ".jpg");
-        }
-        else if (type == MEDIA_TYPE_VIDEO) {
+        } else if (type == MEDIA_TYPE_VIDEO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "VID_" + timeStamp + ".mp4");
-        }
-        else if(type == MEDIA_TYPE_AUDIO){
+        } else if (type == MEDIA_TYPE_AUDIO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "AUD_" + timeStamp + ".3gp");
-        }
-        else {
+                    "AUD_" + timeStamp + ".mp3");
+            audioName = "AUD_" + timeStamp + ".mp3";
+        } else {
             return null;
         }
         //set the image name
@@ -236,7 +237,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
             myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
             myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-            myAudioRecorder.setOutputFile(outputFile);
+            myAudioRecorder.setOutputFile(fileUri.getPath());
             myAudioRecorder.prepare();
             myAudioRecorder.start();
         } catch (IllegalStateException e) {
@@ -268,7 +269,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         MediaPlayer m = new MediaPlayer();
 
         try {
-            m.setDataSource(outputFile);
+            m.setDataSource(fileUri.getPath());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -379,13 +380,13 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         protected Void doInBackground(Void... params) {
 
             try {
-                FileInputStream fis = new FileInputStream(outputFile);
+                FileInputStream fis = new FileInputStream(fileUri.getPath());
                 //System.out.println(file.exists() + "!!");
                 //InputStream in = resource.openStream();
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 byte[] buf = new byte[1024];
                 try {
-                    for (int readNum; (readNum = fis.read(buf)) != -1;) {
+                    for (int readNum; (readNum = fis.read(buf)) != -1; ) {
                         bos.write(buf, 0, readNum); //no doubt here is 0
                         //Writes len bytes from the specified byte array starting at offset off to this byte array output stream.
                     }
@@ -415,7 +416,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
 
                         Map<String, String> parameters = new HashMap<String, String>();
                         parameters.put("encodeString", encode_string);
-                        parameters.put("imageName", "track.3gp");
+                        parameters.put("imageName", audioName);
                         parameters.put("status", "P");
                         parameters.put("userid", "3");
                         parameters.put("type", caseType);
@@ -427,8 +428,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                 };
                 queue.add(request);
 
-            }
-            catch (Exception ex){
+            } catch (Exception ex) {
 
             }
             return null;
