@@ -11,5 +11,6 @@ public class NetworkManager {
     public static final String url_getHistroryLocation  = "http://"+hostIPPort+"/ProtectApp/public/userhistory";
     public static final String url_getLoginVerify = "";
 
+    public static final String url_getCaseDetails       = "http://"+hostIPPort+"/ProtectApp/public/policeopencase";
 
 }

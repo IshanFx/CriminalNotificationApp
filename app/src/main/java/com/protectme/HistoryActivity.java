@@ -1,5 +1,6 @@
 package com.protectme;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +32,7 @@ public class HistoryActivity extends AppCompatActivity {
     public static ArrayList<String> criminalList = new ArrayList();
     Button btn;
     RequestQueue queue;
+
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,10 +131,12 @@ public class HistoryActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(JSONObject response) {
                                 try {
-                                    JSONArray array = response.getJSONArray("Cases");
+                                    JSONArray array = response.getJSONArray("cases");
                                     for (int i = 0; i < array.length(); i++) {
+
                                         JSONObject jsonObject = array.getJSONObject(i);
-                                        publishProgress(jsonObject.getString("STATUS"));
+                                        publishProgress(jsonObject.getString("status"));
+
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
