@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,14 +32,34 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.protectme.dao.Crime;
+import com.protectme.dao.User;
+import com.protectme.database.RealMAdapter;
+import com.protectme.handler.NetworkManager;
 
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -47,6 +68,10 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
+    User user;
+    RealMAdapter realMAdapter;
+    static boolean isUserAvailable = false;
+    RequestQueue queue;
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -63,7 +88,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
-    public  boolean chkUser;
+    public boolean chkUser;
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -77,8 +102,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
-
-
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -102,7 +125,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        realMAdapter = new RealMAdapter(getApplicationContext());
+        if(realMAdapter.checkSecondLogin()){
+            launchHomeActivity();
+        }
     }
+
+
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
@@ -195,8 +225,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            customerLogin(email, password);
+           /* mAuthTask = new UserLoginTask(email, password);
+            mAuthTask.execute((Void) null);*/
         }
     }
 
@@ -289,6 +320,50 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailView.setAdapter(adapter);
     }
 
+    public Boolean customerLogin(String mEmail, String mPassword) {
+        boolean isLoginPass = false;
+        Log.d("Realm", "logintask background");
+        Log.d("Realm", mEmail);
+        Log.d("Realm", mPassword);
+
+        user = new User();
+        user.setEmail(mEmail);
+        user.setPassword(mPassword);
+
+        if (realMAdapter.checkSecondLogin()) {
+            isLoginPass = true;
+            Log.d("Realm", "second login");
+            launchHomeActivity();
+        } else {
+            new UserLoginTask(mEmail,mPassword).execute();
+            Log.d("Realm", "first login");
+
+        }
+                /*ParseUser.logInInBackground(mEmail, mPassword, new LogInCallback() {
+                    public void done(ParseUser user, ParseException e) {
+                        if (user != null) {
+                            chkUser = true;
+                        } else {
+                            Toast.makeText(getApplicationContext(),"User not",Toast.LENGTH_SHORT).show();
+                            chkUser = true;
+
+                            // Signup failed. Look at the ParseException to see what happened.
+                        }
+                    }
+                });*/
+        // Simulate network access.
+        //  Thread.sleep(2000);
+
+        showProgress(false);
+        return isLoginPass;
+    }
+
+    private void launchHomeActivity() {
+        Intent actHome = new Intent(LoginActivity.this, HomeActivity.class);
+        LoginActivity.this.startActivity(actHome);
+        finish();
+    }
+
 
     private interface ProfileQuery {
         String[] PROJECTION = {
@@ -304,24 +379,79 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
+    public class UserLoginTask extends AsyncTask<Void, User, Boolean> {
+        boolean isLoginPass = false;
         private final String mEmail;
         private final String mPassword;
 
         UserLoginTask(String email, String password) {
+            Log.d("Realm", "logintask constructor");
             mEmail = email;
             mPassword = password;
         }
 
         @Override
+        protected void onPreExecute() {
+            showProgress(true);
+        }
+
+        @Override
         protected Boolean doInBackground(Void... params) {
+            isUserAvailable = false;
             // TODO: attempt authentication against a network service.
+            Log.d("Realm", "logintask background");
 
-
+            user.setEmail(mEmail);
+            user.setPassword(mPassword);
             try {
+                queue = Volley.newRequestQueue(getApplicationContext());
+                StringRequest request = new StringRequest(Request.Method.POST, NetworkManager.url_getLoginVerify, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject resposeJSON = new JSONObject(response);
+                            Log.d("Realm", resposeJSON.toString());
+                            //if(resposeJSON.names().get(1).equals("check")){
+                                //Log.d("Realm", resposeJSON.toString());
+                                if (Boolean.valueOf(resposeJSON.getString("check"))) {
+                                    Log.d("Realm", "available");
+                                    isUserAvailable = true;
+                                    user.setId(resposeJSON.getInt("userid"));
+                                    publishProgress(user);
 
-                ParseUser.logInInBackground(mEmail, mPassword, new LogInCallback() {
+
+                                } else {
+                                    isUserAvailable = false;
+                                }
+                            //}
+
+                        } catch (Exception ex) {
+                            Log.d("Realm", ex.toString());
+                            isUserAvailable = false;
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                        Map<String, String> parameters = new HashMap<String, String>();
+                        parameters.put("username", user.getEmail());
+                        parameters.put("password", user.getPassword());
+                        return parameters;
+                    }
+                };
+                //request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                queue.add(request);
+
+
+                /*ParseUser.logInInBackground(mEmail, mPassword, new LogInCallback() {
                     public void done(ParseUser user, ParseException e) {
                         if (user != null) {
                             chkUser = true;
@@ -332,10 +462,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             // Signup failed. Look at the ParseException to see what happened.
                         }
                     }
-                });
+                });*/
                 // Simulate network access.
-              //  Thread.sleep(2000);
+                //  Thread.sleep(2000);
             } catch (Exception e) {
+                Log.d("Realm", e.toString());
                 return false;
             }
 
@@ -348,21 +479,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }*/
 
             // TODO: register the new account here.
-            return true;
+            return isUserAvailable;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onProgressUpdate(User... values) {
+
+            realMAdapter.removeUser();
+            realMAdapter.insertUser(values[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
             mAuthTask = null;
             showProgress(false);
 
             if (success) {
+                launchHomeActivity();
 
-                Intent actHome = new Intent(LoginActivity.this,HomeActivity.class);
-                LoginActivity.this.startActivity(actHome);
-                finish();
-                //finish();
-//                Toast.makeText(getApplicationContext(),"Ok",Toast.LENGTH_LONG).show();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();

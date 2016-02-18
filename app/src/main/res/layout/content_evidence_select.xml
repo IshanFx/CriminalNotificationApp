@@ -8,66 +8,73 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/homebackground"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.protectme.EvidenceSelectActivity"
     tools:showIn="@layout/activity_evidence_select">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
         android:text="@string/picturebtn"
         android:id="@+id/button"
+        style="@style/recordbtn"
+        android:src="@drawable/camera"
+        android:background="@color/colorPrimary"
         android:onClick="startcapture"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentRight="true"
+       />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+
         android:text="@string/videobtn"
+        style="@style/recordbtn"
+        android:src="@drawable/video"
+        android:background="@color/colorPrimary"
         android:id="@+id/button2"
         android:onClick="startVideo"
-        android:layout_alignTop="@+id/button"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentLeft="true"
+      />
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="360dp"
         android:id="@+id/imageView1"
         android:layout_below="@+id/button2"
          />
 
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
         android:text="@string/recordstartbtn"
+        style="@style/recordbtn"
+        android:src="@drawable/recordd"
         android:id="@+id/btnStartRecord"
         android:onClick="startVoiceRecord"
+        android:background="@drawable/home_buttons"
         android:layout_below="@+id/imageView1"
+        android:layout_centerHorizontal="true"
         />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/recordstopbtn"
+    <ImageButton
+        style="@style/recordbtn"
         android:id="@+id/btnStopRecord"
         android:onClick="stopVoiceRecord"
+        android:background="@drawable/home_buttons"
+        android:src="@drawable/recordc"
         android:layout_alignBaseline="@+id/btnStartRecord"
-        android:layout_toEndOf="@+id/btnStartRecord"
-        android:layout_toRightOf="@+id/btnStartRecord"
+        android:layout_below="@+id/imageView1"
+        android:layout_toStartOf="@+id/btnStartRecord"
+        android:layout_toLeftOf="@+id/btnStartRecord"
         />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/recorduploadbtn"
+    <ImageButton
+        style="@style/recordbtn"
         android:id="@+id/btnUploadRecord"
         android:onClick="uploadVoiceRecord"
+        android:src="@drawable/upload"
+        android:layout_below="@+id/imageView1"
+        android:background="@drawable/home_buttons"
         android:layout_alignBaseline="@+id/btnStartRecord"
-        android:layout_toEndOf="@+id/btnStopRecord"
-        android:layout_toRightOf="@+id/btnStopRecord"
+       android:layout_toRightOf="@+id/btnStartRecord"
+
         />
 
     <ProgressBar

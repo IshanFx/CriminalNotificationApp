@@ -4,40 +4,128 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/homebackground"
     android:paddingBottom="@dimen/activity_vertical_margin"
-
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.protectme.HomeActivity"
     tools:showIn="@layout/activity_home">
-
-
-    <Button
-        android:text="@string/kidnapbtn"
-        android:id="@+id/btnKidnap"
-        style="@style/HomeBtn"
-        android:background="@drawable/home_buttons"
-        android:onClick="startRealtimeTrack"
-        android:layout_centerHorizontal="true"
-         />
-    <Button
-        style="@style/HomeBtn"
-        android:text="@string/robberybtn"
-        android:id="@+id/btnRobbery"
-        android:onClick="startStaticLocationTrack"
-        android:background="@drawable/home_buttons"
-        android:layout_below="@+id/btnKidnap"
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:id="@+id/imgHome"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/homelogo"
         android:layout_centerHorizontal="true"
         />
 
-    <Button
-        style="@style/HomeBtn"
-        android:text="@string/evidencebtn"
-        android:layout_below="@+id/btnRobbery"
-        android:background="@drawable/home_buttons"
-        android:id="@+id/btnEvidence"
-        android:layout_centerHorizontal="true"
-        android:onClick="evidenceHomeAvtivity"
-        />
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_gravity="center"
+        android:layout_below="@+id/imgHome"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        card_view:cardBackgroundColor="@color/colorPrimary"
+        card_view:cardCornerRadius="5dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Latitude"
+            android:id="@+id/txtLatShow"
+            style="@style/latlongstyle"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:layout_gravity="center"
+            style="@style/latlongstyle"
+            android:id="@+id/txtLatitude"
+            android:layout_marginLeft="50dp"
+            />
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view2"
+        android:layout_gravity="center"
+        android:layout_below="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        card_view:cardBackgroundColor="@color/colorPrimary"
+        card_view:cardCornerRadius="5dp">
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Longitude"
+            android:layout_gravity="center_vertical"
+            style="@style/latlongstyle"
+            android:id="@+id/txtLongShow"
+           android:layout_marginLeft="10dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            style="@style/latlongstyle"
+            android:id="@+id/txtLongitude"
+            android:layout_gravity="center"
+            android:layout_marginLeft="50dp"
+           />
+
+</android.support.v7.widget.CardView>
+
+
+
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/card_view2"
+        >
+        <ImageButton
+            style="@style/HomeBtn"
+            android:text="@string/evidencebtn"
+            android:background="@drawable/home_buttons"
+            android:id="@+id/btnEvidence"
+            android:layout_gravity="bottom"
+            android:layout_width="110dp"
+            android:onClick="evidenceHomeAvtivity"
+            android:src="@drawable/camera"
+            />
+        <ImageButton
+            android:text="@string/kidnapbtn"
+            android:id="@+id/btnKidnap"
+            style="@style/HomeBtn"
+            android:src="@drawable/run"
+            android:layout_gravity="bottom"
+            android:layout_width="110dp"
+            android:background="#E74C3C"
+            android:onClick="startRealtimeTrack"
+
+            />
+        <ImageButton
+            style="@style/HomeBtn"
+            android:id="@+id/btnRobbery"
+            android:text="@string/robberybtn"
+            android:onClick="startStaticLocationTrack"
+            android:background="@drawable/home_buttons"
+            android:src="@drawable/marker"
+            android:layout_width="110dp"
+            android:layout_gravity="bottom"
+            />
+
+
+    </LinearLayout>
+
+
+
 </RelativeLayout>
 

@@ -28,6 +28,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.parse.ParseUser;
+import com.protectme.database.RealMAdapter;
 import com.protectme.handler.NetworkManager;
 import com.protectme.handler.SMSManager;
 
@@ -35,6 +36,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,15 +55,18 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
 
     Boolean startRealTimeTrack = false;
     private GoogleApiClient mGoogleApiClient;
-    Button btnKidnapClick;
-    Button btnRobberyClick;
-    Button btnEvidenceClick;
+    ImageButton btnKidnapClick;
+    ImageButton btnRobberyClick;
+    ImageButton btnEvidenceClick;
+    TextView txtLatitude;
+    TextView txtLongitude;
     static int startCycle = 1;
     SMSManager smsManage;
 
     public static int lastCaseId=-1;
     RequestQueue queue;
-
+    RealMAdapter realMAdapter;
+    public static Integer userID=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,15 +74,19 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         queue = Volley.newRequestQueue(getApplicationContext());
-        btnKidnapClick = (Button) findViewById(R.id.btnKidnap);
-        btnRobberyClick = (Button) findViewById(R.id.btnRobbery);
+        btnKidnapClick = (ImageButton) findViewById(R.id.btnKidnap);
+        btnRobberyClick = (ImageButton) findViewById(R.id.btnRobbery);
+        txtLatitude = (TextView) findViewById(R.id.txtLatitude);
+        txtLongitude = (TextView) findViewById(R.id.txtLongitude);
+        realMAdapter = new RealMAdapter(getApplicationContext());
+        userID = realMAdapter.getUserId();
 
         smsManage = new SMSManager();
         locationManager =
                 (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         buildGoogleApiClient();
         createLocationRequest();
-        btnEvidenceClick = (Button) findViewById(R.id.btnEvidence);
+        btnEvidenceClick = (ImageButton) findViewById(R.id.btnEvidence);
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -141,7 +150,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
             startActivity(historyIntent);
         }
         if (id == R.id.logout_setting) {
-            ParseUser.logOut();
+           // ParseUser.logOut();
+            realMAdapter.removeUser();
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
         }
@@ -185,7 +195,9 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     * */
     private void updateUI() {
         if (startRealTimeTrack) {
-            btnKidnapClick.setText(String.valueOf(mLastLocation.getLatitude()) + "\n " + String.valueOf(mLastLocation.getLongitude()));
+            txtLatitude.setText(String.valueOf(mLastLocation.getLatitude()));
+            txtLongitude.setText(String.valueOf(mLastLocation.getLongitude()));
+
             caseType = "K";
             LocationAsync loc = new LocationAsync();
             loc.execute();
@@ -237,7 +249,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         if (startRealTimeTrack) {
             startRealTimeTrack = false;
             btnKidnapClick.setBackgroundResource(R.drawable.home_button_normal);
-            btnKidnapClick.setText(getResources().getText(R.string.kidnapbtn, null));
+
             lastCaseId = -1;
         } else {
             startRealTimeTrack = true;
@@ -255,8 +267,9 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
+            txtLatitude.setText(String.valueOf(mLastLocation.getLatitude()));
+            txtLongitude.setText(String.valueOf(mLastLocation.getLongitude()));
 
-            btnRobberyClick.setText(String.valueOf(mLastLocation.getLatitude()) + " " + String.valueOf(mLastLocation.getLongitude()));
             caseType = "R";
             LocationAsync loc = new LocationAsync();
             loc.execute();
@@ -291,11 +304,10 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                 }) {
                     @Override
                     protected Map<String, String> getParams() throws AuthFailureError {
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                         Map<String, String> parameters = new HashMap<String, String>();
                         parameters.put("status", "P");
-                        parameters.put("userid", "3");
+                        parameters.put("userid",userID.toString() );
                         parameters.put("type", caseType);
                         parameters.put("latitude", String.valueOf(mLastLocation.getLatitude()));
                         parameters.put("longitude", String.valueOf(mLastLocation.getLongitude()));
@@ -306,7 +318,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                 request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                 queue.add(request);
             } catch (Exception ex) {
-                // Toast.makeText(MainActivity.this,"Errr",Toast.LENGTH_SHORT).show();
+               Log.d("AsyncError",ex.toString());
             }
             //Toast.makeText(MainActivity.this,"Finish",Toast.LENGTH_SHORT).show();
             return null;

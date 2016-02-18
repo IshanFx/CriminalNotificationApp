@@ -9,9 +9,15 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.protectme.LoginActivity"
-    android:background="@color/logingBackground">
+    android:background="#fff">
 
     <!-- Login progress -->
+    <ImageView
+        android:layout_width="600dp"
+        android:layout_height="5dp"
+        android:src="@drawable/top"
+        android:id="@+id/imageView2" />
+
     <ProgressBar
         android:id="@+id/login_progress"
         style="?android:attr/progressBarStyleLarge"
@@ -21,9 +27,9 @@
         android:visibility="gone" />
 
     <ImageView
-        android:layout_width="250dp"
-        android:layout_marginTop="70dp"
-        android:layout_height="50dp"
+        android:layout_width="170dp"
+        android:layout_marginTop="30dp"
+        android:layout_height="150dp"
         android:id="@+id/imageView"
         android:background="@drawable/logo" />
 
@@ -38,7 +44,7 @@
             android:id="@+id/email_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="40dp"
             android:orientation="vertical">
 
             <android.support.design.widget.TextInputLayout
@@ -48,10 +54,7 @@
                 <AutoCompleteTextView
                     android:id="@+id/email"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prompt_email"
                     style="@style/LogInTheme"
-
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true" />
@@ -65,8 +68,7 @@
                 <EditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prompt_password"
+                    style="@style/LogInTheme"
                     android:imeActionId="@+id/login"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
@@ -81,9 +83,7 @@
                 style="@style/LogInButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:text="@string/action_sign_in"
-
                 android:textStyle="bold" />
 
         </LinearLayout>

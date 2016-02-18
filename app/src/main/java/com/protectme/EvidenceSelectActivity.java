@@ -21,6 +21,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.protectme.database.RealMAdapter;
 import com.protectme.handler.NetworkManager;
 
 import java.io.BufferedInputStream;
@@ -60,7 +62,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     public static final int MEDIA_TYPE_AUDIO = 3;
 
     public static String audioName = "";
-    Button start, stop, uploadrecord;
+    ImageButton start, stop, uploadrecord;
     private MediaRecorder myAudioRecorder;
     private static String outputFile = null;
     ProgressBar uploadProgress;
@@ -71,13 +73,14 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     private Bitmap bitmap;
     private String encode_string;
     private static String imageName;
+    private static Integer userID=0;
 
     LocationManager locationManager;
     public static Location mLastLocation;
     public static String caseType = "E";
     LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
-
+    RealMAdapter realMAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,11 +89,13 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         setSupportActionBar(toolbar);
         captureImageView = (ImageView) findViewById(R.id.imageView1);
 
-        start = (Button) findViewById(R.id.btnStartRecord);
-        stop = (Button) findViewById(R.id.btnStopRecord);
-        uploadrecord = (Button) findViewById(R.id.btnUploadRecord);
+        start = (ImageButton) findViewById(R.id.btnStartRecord);
+        stop = (ImageButton) findViewById(R.id.btnStopRecord);
+        uploadrecord = (ImageButton) findViewById(R.id.btnUploadRecord);
         uploadProgress = (ProgressBar) findViewById(R.id.uploadProgress);
         uploadProgress.setVisibility(View.INVISIBLE);
+        realMAdapter = new RealMAdapter(getApplicationContext());
+        userID = realMAdapter.getUserId();
 
         stop.setEnabled(false);
         uploadrecord.setEnabled(false);
@@ -418,7 +423,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                         parameters.put("encodeString", encode_string);
                         parameters.put("imageName", audioName);
                         parameters.put("status", "P");
-                        parameters.put("userid", "3");
+                        parameters.put("userid",userID.toString());
                         parameters.put("type", caseType);
                         parameters.put("latitude", String.valueOf(mLastLocation.getLatitude()));
                         parameters.put("longitude", String.valueOf(mLastLocation.getLongitude()));
