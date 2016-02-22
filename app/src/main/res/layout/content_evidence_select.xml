@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="0px"
     android:background="@color/homebackground"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.protectme.EvidenceSelectActivity"
@@ -49,7 +50,7 @@
     <ImageButton
         style="@style/recordbtn"
         android:id="@+id/btnUploadRecord"
-        android:onClick="uploadVoiceRecord"
+        android:onClick="uploadEvidence"
         android:src="@drawable/upload"
         android:layout_below="@+id/button2"
         android:background="@drawable/home_buttons"

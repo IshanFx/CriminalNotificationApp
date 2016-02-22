@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -41,6 +43,8 @@ import com.protectme.handler.NetworkManager;
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadNotificationConfig;
 
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,7 +61,6 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     public static final int MEDIA_TYPE_AUDIO = 3;
-    static File mediaStorageDir2;
 
     public static boolean isRecordStart=false;
     public static String audioName = "";
@@ -67,14 +70,19 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     private static String outputFile = null;
     ProgressBar uploadProgress;
     String selectedImagePath;
+    MediaPlayer mediaPlayer;
 
     private static Uri fileUri;
+    private static Uri imageUri;
+    private static Uri videoUri;
+    private static Uri voiceUri;
+
     ImageView captureImageView;
     private Bitmap bitmap;
     private String encode_string;
     private static String imageName;
     private static Integer userID=0;
-
+    private static int lastCaseId = -1;
     LocationManager locationManager;
     public static Location mLastLocation;
     public static String caseType = "E";
@@ -97,11 +105,12 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         realMAdapter = new RealMAdapter(getApplicationContext());
         userID = realMAdapter.getUserId();
 
-        uploadrecord.setEnabled(false);
+
         outputFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/recording.3gp";
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         buildGoogleApiClient();
+
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -112,8 +121,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                 .build();
         mGoogleApiClient.connect();
         if (mGoogleApiClient.isConnected()) {
-            Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
-
+           // Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -132,140 +140,41 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     public void getLastLocation() {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-        Toast.makeText(this, String.valueOf(mLastLocation.getLatitude()).toString(), Toast.LENGTH_SHORT).show();
+       Log.d("Evidence","Latitude"+String.valueOf(mLastLocation.getLatitude())+"Longitude"+String.valueOf(mLastLocation.getLongitude()));
     }
 
     public void startcapture(View view) {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
         fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a file to save the image
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
-
+        imageUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri); // set the image file name
         startActivityForResult(intent, CAPTURE_IMAGE);
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        try {
-            if (requestCode == CAPTURE_IMAGE) {
-
-                if (resultCode == RESULT_OK) {
-
-                    Toast.makeText(this, "Images captued" + data.getData(), Toast.LENGTH_LONG).show();
-                    // selectedImagePath = getAbsolutePath(data.getData());
-
-//                    captureImageView.setImageBitmap(decodeFile(selectedImagePath));
-                    captureImageView.setImageBitmap((Bitmap) data.getExtras().get("data"));
-                    new CaptureAsync().execute();
-                    // saveCaptureImage();
-                } else if (resultCode == RESULT_CANCELED) {
-                    Toast.makeText(this, "User cancelled", Toast.LENGTH_SHORT).show();
-                } else {
-
-                }
-            }
-            if (requestCode == CAPTURE_VIDEO) {
-                if (resultCode == RESULT_OK) {
-                    // Video captured and saved to fileUri specified in the Intent
-                    Toast.makeText(this, "Video saved to:\n" + data.getData(), Toast.LENGTH_LONG).show();
-                    uploadMultipart(getApplicationContext());
-                    //new VideoAsync().execute();
-                } else if (resultCode == RESULT_CANCELED) {
-                    // User cancelled the video capture
-                } else {
-                    // Video capture failed, advise user
-                }
-            }
-        } catch (Exception ex) {
-            Toast.makeText(this, "Error", Toast.LENGTH_LONG).show();
-            Log.d("MainError", ex.toString());
-        }
-    }
-
-    public void uploadMultipart(final Context context) {
-        try {
-            String uploadId =
-                    new MultipartUploadRequest(context,NetworkManager.url_upload )
-                            .addFileToUpload(fileUri.getPath(),"image")
-                            .setNotificationConfig(new UploadNotificationConfig())
-                            .setMaxRetries(2)
-                            .startUpload();
-        } catch (Exception exc) {
-            Log.e("AndroidUploadService", exc.getMessage());
-        }
     }
     /*
     * Video Recording Listner
-    * */
+    */
     public void startVideo(View view) {
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         fileUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO); // create a file to save the image
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        videoUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, 10000);
         startActivityForResult(intent, CAPTURE_VIDEO);
     }
 
-    /*Path create start */
-    private static Uri getOutputMediaFileUri(int type) {
-        return Uri.fromFile(getOutputMediaFile(type));
-    }
-
-    /**
-     * Create a File for saving an image or video
-     */
-    private static File getOutputMediaFile(int type) {
-        File mediaStorageDir = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "ProtectMEAPP");
-        mediaStorageDir2 = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "ProtectMEAPP");
-        mediaStorageDir2 = new File(mediaStorageDir2.getPath()+File.separator+"write.txt");
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_" + timeStamp + ".jpg");
-        }
-        else if (type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "MOV_0015.mp4");
-           // videoName = "VID_"+timeStamp+".mp4";
-            videoName = "MOV_0015.mp4";
-        }
-        else if (type == MEDIA_TYPE_AUDIO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "AUD_" + timeStamp + ".mp3");
-            audioName = "AUD_" + timeStamp + ".mp3";
-        } else {
-            return null;
-        }
-        //set the image name
-        imageName = "IMG" + timeStamp + ".jpg";
-        return mediaFile;
-    }
-    /*Path create end*/
-
-    /*Voice record methods -  start*/
-
     public void startVoiceRecord(View view) {
         try {
-            if(isRecordStart) {
+            if(!isRecordStart) {
                 fileUri = getOutputMediaFileUri(MEDIA_TYPE_AUDIO);
+                voiceUri = getOutputMediaFileUri(MEDIA_TYPE_AUDIO);
                 myAudioRecorder = new MediaRecorder();
                 myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
                 myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
                 myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-                myAudioRecorder.setOutputFile(fileUri.getPath());
+                myAudioRecorder.setOutputFile(voiceUri.getPath());
                 myAudioRecorder.prepare();
                 myAudioRecorder.start();
-                start.setEnabled(false);
-
+                isRecordStart = true;
             }
             else{
                 stopVoiceRecord();
@@ -287,30 +196,191 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         myAudioRecorder.stop();
         myAudioRecorder.release();
         myAudioRecorder = null;
+        isRecordStart = false;
         Toast.makeText(getApplicationContext(), "Audio recorded successfully", Toast.LENGTH_LONG).show();
     }
 
-    public void uploadVoiceRecord(View view) {
-        MediaPlayer m = new MediaPlayer();
-
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         try {
-            m.setDataSource(fileUri.getPath());
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (requestCode == CAPTURE_IMAGE) {
+
+                if (resultCode == RESULT_OK) {
+
+                    Toast.makeText(this, "Images capture" + data.getData(), Toast.LENGTH_LONG).show();
+                    // selectedImagePath = getAbsolutePath(data.getData());
+
+//                    captureImageView.setImageBitmap(decodeFile(selectedImagePath));
+                    captureImageView.setImageBitmap((Bitmap) data.getExtras().get("data"));
+
+                    // saveCaptureImage();
+                } else if (resultCode == RESULT_CANCELED) {
+                    Toast.makeText(this, "User cancelled", Toast.LENGTH_SHORT).show();
+                } else {
+
+                }
+            }
+            if (requestCode == CAPTURE_VIDEO) {
+                if (resultCode == RESULT_OK) {
+                    // Video captured and saved to fileUri specified in the Intent
+                    Toast.makeText(this, "Video saved to:\n" + data.getData(), Toast.LENGTH_LONG).show();
+
+                    //new VideoAsync().execute();
+                } else if (resultCode == RESULT_CANCELED) {
+                    // User cancelled the video capture
+                } else {
+                    // Video capture failed, advise user
+                }
+            }
+        } catch (Exception ex) {
+            Toast.makeText(this, "Error", Toast.LENGTH_LONG).show();
+            Log.d("MainError", ex.getMessage().toString());
         }
-
-        try {
-            m.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        m.start();
-        AudioAsync audioAsync = new AudioAsync();
-        audioAsync.execute();
-
     }
 
+    public void uploadMultipart(final Context context) {
+        try {
+            String uploadId =
+                    new MultipartUploadRequest(context,NetworkManager.url_upload )
+                            .addFileToUpload(videoUri.getPath(),"image")
+                            .setNotificationConfig(new UploadNotificationConfig())
+                            .setMaxRetries(2)
+                            .startUpload();
+        } catch (Exception exc) {
+            Log.e("AndroidUploadService", exc.getMessage());
+        }
+    }
+    /*Path create start */
+    private static Uri getOutputMediaFileUri(int type) {
+        return Uri.fromFile(getOutputMediaFile(type));
+    }
+
+    /**
+     * Create a File for saving an image or video
+     */
+    private static File getOutputMediaFile(int type) {
+        File mediaStorageDir = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "ProtectMEAPP");
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("MyCameraApp", "failed to create directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "IMG_" + timeStamp + ".jpg");
+
+        }
+        else if (type == MEDIA_TYPE_VIDEO) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "MOV_0015.mp4");
+           // videoName = "VID_"+timeStamp+".mp4";
+            videoName = "MOV_0015.mp4";
+        }
+        else if (type == MEDIA_TYPE_AUDIO) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "AUD_" + timeStamp + ".mp3");
+            audioName = "AUD_" + timeStamp + ".mp3";
+        } else {
+            return null;
+        }
+        //set the image name
+        imageName = "IMG" + timeStamp + ".jpg";
+        return mediaFile;
+    }
+
+    /*Path create end*/
+
+    /*Voice record methods -  start*/
+
+    public void uploadEvidence(View view) {
+       /* mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(voiceUri.getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        mediaPlayer.start();*/
+        if(lastCaseId==-1) {
+            sendLocationData();
+        }
+        Log.d("evicence","Save Extra");
+        try {
+            if(imageUri!=null){
+                new CaptureAsync().execute();
+              //  imageUri = null;
+            }
+            if (voiceUri!=null) {
+               new AudioAsync().execute();
+               // voiceUri = null;
+            }
+            if (videoUri!=null) {
+                uploadMultipart(getApplicationContext());
+            }
+        } catch (Exception e) {
+            Log.d("evicence",e.getMessage().toString());
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        lastCaseId = -1;
+        imageUri = null;
+        voiceUri = null;
+        videoUri = null;
+    }
+
+    public  void sendLocationData(){
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest request = new StringRequest(Request.Method.POST, NetworkManager.url_saveCaseLocation, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try{
+                    JSONObject resposeJSON = new JSONObject(response);
+                    if(resposeJSON.names().get(0).equals("caseid")){
+                        lastCaseId = resposeJSON.getInt("caseid");
+                        Toast.makeText(getApplicationContext(),"Last case id:"+lastCaseId,Toast.LENGTH_SHORT).show();
+                    }
+                }
+                catch(Exception ex){
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+
+                Map<String, String> parameters = new HashMap<String, String>();
+                parameters.put("status", "P");
+                parameters.put("userid",userID.toString() );
+                parameters.put("type", caseType);
+                parameters.put("latitude", String.valueOf(mLastLocation.getLatitude()));
+                parameters.put("longitude", String.valueOf(mLastLocation.getLongitude()));
+                parameters.put("caseid",String.valueOf(lastCaseId));
+                return parameters;
+            }
+        };
+        request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(request);
+    }
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -332,8 +402,25 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
 
     }
 
-    /*Voice record methods -  end*/
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putString("imageuri", imageUri.toString());
+        outState.putString("videouri", videoUri.toString());
+        outState.putString("voiceuri", voiceUri.toString());
+    }
 
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        imageUri = Uri.parse(savedInstanceState.getString("imageuri"));
+        videoUri = Uri.parse(savedInstanceState.getString("videouri"));
+        voiceUri = Uri.parse(savedInstanceState.getString("voiceuri"));
+
+    }
+
+    /*Voice record methods -  end*/
     private class CaptureAsync extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -343,7 +430,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
 
         @Override
         protected Void doInBackground(Void... params) {
-            bitmap = BitmapFactory.decodeFile(fileUri.getPath());
+            bitmap = BitmapFactory.decodeFile(imageUri.getPath());
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
 
@@ -370,12 +457,13 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
 
                         Map<String, String> parameters = new HashMap<String, String>();
                         parameters.put("encodeString", encode_string);
-                        parameters.put("imageName", imageName);
-                        parameters.put("status", "P");
+                        parameters.put("filename", imageName);
+                        parameters.put("crimeid",String.valueOf(lastCaseId));
+                        /*parameters.put("status", "P");
                         parameters.put("userid", "3");
                         parameters.put("type", caseType);
                         parameters.put("latitude", String.valueOf(mLastLocation.getLatitude()));
-                        parameters.put("longitude", String.valueOf(mLastLocation.getLongitude()));
+                        parameters.put("longitude", String.valueOf(mLastLocation.getLongitude()));*/
 
                         return parameters;
                     }
@@ -393,7 +481,6 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
             uploadProgress.setVisibility(View.INVISIBLE);
         }
     }
-
     public class AudioAsync extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -405,7 +492,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         protected Void doInBackground(Void... params) {
 
             try {
-                FileInputStream fis = new FileInputStream(fileUri.getPath());
+                FileInputStream fis = new FileInputStream(voiceUri.getPath());
                 //System.out.println(file.exists() + "!!");
                 //InputStream in = resource.openStream();
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -439,13 +526,14 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
 
                         Map<String, String> parameters = new HashMap<String, String>();
                         parameters.put("encodeString", encode_string);
-                        parameters.put("imageName", audioName);
-                        parameters.put("status", "P");
+                        parameters.put("filename", audioName);
+                        parameters.put("crimeid",String.valueOf(lastCaseId));
+                    /*    parameters.put("status", "P");
                         parameters.put("userid",userID.toString());
                         parameters.put("type", caseType);
                         parameters.put("latitude", String.valueOf(mLastLocation.getLatitude()));
                         parameters.put("longitude", String.valueOf(mLastLocation.getLongitude()));
-
+*/
                         return parameters;
                     }
                 };
@@ -462,8 +550,6 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
             uploadProgress.setVisibility(View.INVISIBLE);
         }
     }
-
-
     private class VideoAsync extends AsyncTask<Void, Void, Void> {
 
         @Override
