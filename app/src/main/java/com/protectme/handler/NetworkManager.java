@@ -13,5 +13,7 @@ public class NetworkManager {
 
     public static final String url_getCaseDetails       = "http://"+hostIPPort+"/public/policeopencase";
     public static final String url_getLoginVerify       = "http://"+hostIPPort+"/public/userlogin";
+    public static final String url_closeCase            = "http://"+hostIPPort+"/public/userclosecase";
+    public static final String url_upload               = "http://"+hostIPPort+"/public/fileupload";
 
 }

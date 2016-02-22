@@ -2,12 +2,10 @@ package com.protectme;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
-import android.media.AudioFormat;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -20,7 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -41,18 +38,18 @@ import com.google.android.gms.location.LocationServices;
 import com.protectme.database.RealMAdapter;
 import com.protectme.handler.NetworkManager;
 
-import java.io.BufferedInputStream;
+import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.UploadNotificationConfig;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+
 
 public class EvidenceSelectActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final int CAPTURE_IMAGE = 100;
@@ -60,9 +57,12 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     public static final int MEDIA_TYPE_AUDIO = 3;
+    static File mediaStorageDir2;
 
+    public static boolean isRecordStart=false;
     public static String audioName = "";
-    ImageButton start, stop, uploadrecord;
+    public static String videoName = "";
+    ImageButton start, uploadrecord;
     private MediaRecorder myAudioRecorder;
     private static String outputFile = null;
     ProgressBar uploadProgress;
@@ -90,14 +90,13 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         captureImageView = (ImageView) findViewById(R.id.imageView1);
 
         start = (ImageButton) findViewById(R.id.btnStartRecord);
-        stop = (ImageButton) findViewById(R.id.btnStopRecord);
+
         uploadrecord = (ImageButton) findViewById(R.id.btnUploadRecord);
         uploadProgress = (ProgressBar) findViewById(R.id.uploadProgress);
         uploadProgress.setVisibility(View.INVISIBLE);
         realMAdapter = new RealMAdapter(getApplicationContext());
         userID = realMAdapter.getUserId();
 
-        stop.setEnabled(false);
         uploadrecord.setEnabled(false);
         outputFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/recording.3gp";
 
@@ -168,7 +167,8 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                 if (resultCode == RESULT_OK) {
                     // Video captured and saved to fileUri specified in the Intent
                     Toast.makeText(this, "Video saved to:\n" + data.getData(), Toast.LENGTH_LONG).show();
-                    new CaptureAsync().execute();
+                    uploadMultipart(getApplicationContext());
+                    //new VideoAsync().execute();
                 } else if (resultCode == RESULT_CANCELED) {
                     // User cancelled the video capture
                 } else {
@@ -181,6 +181,18 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         }
     }
 
+    public void uploadMultipart(final Context context) {
+        try {
+            String uploadId =
+                    new MultipartUploadRequest(context,NetworkManager.url_upload )
+                            .addFileToUpload(fileUri.getPath(),"image")
+                            .setNotificationConfig(new UploadNotificationConfig())
+                            .setMaxRetries(2)
+                            .startUpload();
+        } catch (Exception exc) {
+            Log.e("AndroidUploadService", exc.getMessage());
+        }
+    }
     /*
     * Video Recording Listner
     * */
@@ -203,7 +215,9 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     private static File getOutputMediaFile(int type) {
         File mediaStorageDir = new File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "ProtectMEAPP");
-
+        mediaStorageDir2 = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "ProtectMEAPP");
+        mediaStorageDir2 = new File(mediaStorageDir2.getPath()+File.separator+"write.txt");
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 Log.d("MyCameraApp", "failed to create directory");
@@ -217,10 +231,14 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         if (type == MEDIA_TYPE_IMAGE) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_" + timeStamp + ".jpg");
-        } else if (type == MEDIA_TYPE_VIDEO) {
+        }
+        else if (type == MEDIA_TYPE_VIDEO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "VID_" + timeStamp + ".mp4");
-        } else if (type == MEDIA_TYPE_AUDIO) {
+                    "MOV_0015.mp4");
+           // videoName = "VID_"+timeStamp+".mp4";
+            videoName = "MOV_0015.mp4";
+        }
+        else if (type == MEDIA_TYPE_AUDIO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "AUD_" + timeStamp + ".mp3");
             audioName = "AUD_" + timeStamp + ".mp3";
@@ -237,14 +255,21 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
 
     public void startVoiceRecord(View view) {
         try {
-            fileUri = getOutputMediaFileUri(MEDIA_TYPE_AUDIO);
-            myAudioRecorder = new MediaRecorder();
-            myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-            myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-            myAudioRecorder.setOutputFile(fileUri.getPath());
-            myAudioRecorder.prepare();
-            myAudioRecorder.start();
+            if(isRecordStart) {
+                fileUri = getOutputMediaFileUri(MEDIA_TYPE_AUDIO);
+                myAudioRecorder = new MediaRecorder();
+                myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+                myAudioRecorder.setOutputFile(fileUri.getPath());
+                myAudioRecorder.prepare();
+                myAudioRecorder.start();
+                start.setEnabled(false);
+
+            }
+            else{
+                stopVoiceRecord();
+            }
         } catch (IllegalStateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -253,20 +278,15 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
             e.printStackTrace();
         }
 
-        start.setEnabled(false);
-        stop.setEnabled(true);
+
 
         Toast.makeText(getApplicationContext(), "Recording started", Toast.LENGTH_LONG).show();
     }
 
-    public void stopVoiceRecord(View view) {
+    public void stopVoiceRecord() {
         myAudioRecorder.stop();
         myAudioRecorder.release();
         myAudioRecorder = null;
-
-        stop.setEnabled(false);
-        uploadrecord.setEnabled(true);
-
         Toast.makeText(getApplicationContext(), "Audio recorded successfully", Toast.LENGTH_LONG).show();
     }
 
@@ -390,14 +410,12 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                 //InputStream in = resource.openStream();
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 byte[] buf = new byte[1024];
-                try {
+
                     for (int readNum; (readNum = fis.read(buf)) != -1; ) {
                         bos.write(buf, 0, readNum); //no doubt here is 0
                         //Writes len bytes from the specified byte array starting at offset off to this byte array output stream.
                     }
-                } catch (IOException ex) {
 
-                }
                 byte[] bytes = bos.toByteArray();
                 encode_string = Base64.encodeToString(bytes, 0);
 
@@ -434,8 +452,83 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                 queue.add(request);
 
             } catch (Exception ex) {
-
+                Log.d("evi",ex.getMessage().toString());
             }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            uploadProgress.setVisibility(View.INVISIBLE);
+        }
+    }
+
+
+    private class VideoAsync extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            uploadProgress.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+
+              //  FileInputStream fis = new FileInputStream(fileUri.getPath());
+                //System.out.println(file.exists() + "!!");
+                //InputStream in = resource.openStream();
+               /* ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                byte[] buf = new byte[3000];
+
+                for (int readNum; (readNum = fis.read(buf)) != -1; ) {
+                    bos.write(buf, 0, readNum); //no doubt here is 0
+                    //Writes len bytes from the specified byte array starting at offset off to this byte array output stream.
+                }
+
+                byte[] bytes = bos.toByteArray();*/
+              /*  byte[] dataByte = new byte[1024];
+                FileUtils.writeByteArrayToFile(new File(mediaStorageDir2.getPath()),FileUtils.readFileToByteArray(new File(fileUri.getPath())));
+
+                dataByte = FileUtils.readFileToByteArray(new File(fileUri.getPath()));
+                encode_string = Base64.encodeToString(dataByte, 0);*/
+
+               // MultipartRequest multipartRequest = new MultipartRequest(NetworkManager.url_upload,null,null,new File(fileUri.getPath()),map);
+                /*RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+                StringRequest request = new StringRequest(Request.Method.POST, NetworkManager.url_saveEvidenceLocation, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+
+
+                        Map<String, String> parameters = new HashMap<String, String>();
+                        parameters.put("encodeString", encode_string);
+                        parameters.put("imageName", videoName);
+                        parameters.put("status", "P");
+                        parameters.put("userid", "3");
+                        parameters.put("type", caseType);
+                        parameters.put("latitude", String.valueOf(mLastLocation.getLatitude()));
+                        parameters.put("longitude", String.valueOf(mLastLocation.getLongitude()));
+
+                        return parameters;
+                    }
+                };
+                queue.add(request);*/
+            } catch (Exception ex) {
+                Log.d("evi",ex.getMessage().toString());
+            }
+            //Toast.makeText(MainActivity.this,"Finish",Toast.LENGTH_SHORT).show();
             return null;
         }
 

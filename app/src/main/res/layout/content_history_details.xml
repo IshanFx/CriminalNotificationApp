@@ -14,35 +14,141 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:stretchColumns="1"
+        android:layout_height="230dp"
+        android:layout_marginTop="100dp"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:id="@+id/tableLayout">
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            style="@style/historydetailtable"
+            android:layout_height="match_parent">
             <TextView
-                android:layout_column="1"
-                android:layout_width="match_parent"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:text="New Text"
-                android:id="@+id/textView"
+                android:text="@string/casedate"
+                android:id="@+id/txtDateShow"
                />
-            <EditText
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/editText"
+                android:id="@+id/txtDate"
+                android:text="New Text"
+                android:layout_column="1"
                 android:layout_alignParentTop="true"
                 />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
+            style="@style/historydetailtable"
             android:layout_height="wrap_content">
+            <TextView
 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/casetime"
+                android:id="@+id/txtTimeShow"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtTime"
+                android:text="New Text"
+                android:layout_column="1"
+                android:layout_alignParentTop="true"
+                />
         </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            style="@style/historydetailtable"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/caseid"
+                android:id="@+id/txtIdShow"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtId"
+                android:text="New Text"
+                android:layout_column="1"
 
+                />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            style="@style/historydetailtable"
+            android:layout_height="wrap_content">
+            <TextView
 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/casetype"
+                android:id="@+id/txtTypeShow"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtType"
+                android:text="New Text"
+                android:layout_column="1"
+
+                />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            style="@style/historydetailtable"
+            android:layout_height="wrap_content">
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/casestatus"
+                android:id="@+id/txtLatitudeShow"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtLatitude"
+                android:text="New Text"
+                android:layout_column="1"
+                android:layout_alignParentTop="true"
+                />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Text"
+                android:id="@+id/txtLongitudeShow"
+                />
+            <TextView
+                android:layout_column="1"
+                android:text="New Text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtLongitude"
+
+                />
+        </TableRow>
     </TableLayout>
+
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="Close Case"
+        android:id="@+id/btnCloseCase"
+        android:background="@color/colorPrimary"
+        android:textColor="#fff"
+        android:layout_below="@+id/tableLayout"
+        android:layout_alignRight="@+id/tableLayout"
+        android:layout_alignEnd="@+id/tableLayout" />
+
+
 </RelativeLayout>

@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         card_view:cardBackgroundColor="@color/colorPrimary"
-        card_view:cardCornerRadius="5dp">
+        card_view:cardCornerRadius="0dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -100,6 +100,7 @@
             android:onClick="evidenceHomeAvtivity"
             android:src="@drawable/camera"
             />
+
         <ImageButton
             android:text="@string/kidnapbtn"
             android:id="@+id/btnKidnap"

@@ -41,7 +41,9 @@
             android:name=".HistoryActivity"
             android:label="@string/title_activity_history"
             android:parentActivityName=".HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" >
+
+        </activity>
         <activity
             android:name=".HistoryDetailsActivity"
             android:label="@string/title_activity_history_details"

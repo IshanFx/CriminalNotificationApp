@@ -1,13 +1,13 @@
 package com.protectme.dao;
 
-import java.util.Date;
+import java.io.Serializable;
 
 import io.realm.RealmObject;
 
 /**
  * Created by IshanFx on 1/5/2016.
  */
-public class Crime extends RealmObject {
+public class Crime extends RealmObject implements Serializable {
     private int id;
     private String date;
     private String status;

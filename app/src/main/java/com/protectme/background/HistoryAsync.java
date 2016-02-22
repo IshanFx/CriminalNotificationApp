@@ -2,16 +2,12 @@ package com.protectme.background;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +38,7 @@ public class HistoryAsync extends AsyncTask<Void,Void,List<ParseObject>> {
     @Override
     protected List<ParseObject> doInBackground(Void... params) {
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Case");
+       /* ParseQuery<ParseObject> query = ParseQuery.getQuery("Case");
         query.whereEqualTo("userid", 1);
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> scoreList, ParseException e) {
@@ -54,7 +50,7 @@ public class HistoryAsync extends AsyncTask<Void,Void,List<ParseObject>> {
                     Log.d("score", "Error: " + e.getMessage());
                 }
             }
-        });
+        });*/
         return dataList;
     }
 

@@ -2,17 +2,21 @@ package com.protectme;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -41,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.realm.Realm;
+import io.realm.internal.android.JsonUtils;
 
 public class HistoryActivity extends AppCompatActivity {
 
@@ -54,7 +59,8 @@ public class HistoryActivity extends AppCompatActivity {
     public static Integer userId = 0;
     ListView historyList;
     ArrayAdapter<Crime> crimeAdapter;
-
+    Integer crimeId=0;
+    Crime crimeSelect;
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,12 +87,43 @@ public class HistoryActivity extends AppCompatActivity {
         new HistoryAsync().execute();*/
 
         //getHistoryData();
-       /* historyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        historyList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                crimeSelect = (Crime) historyList.getItemAtPosition(position);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(HistoryActivity.this);
+                builder.setTitle("Close case");
+
+                builder.setMessage("Are your sure to close this case");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        new HistoryCloseAsync().execute();
+                        Toast.makeText(getApplicationContext(), "OK", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+
+                dialog.show();
+                return false;
+            }
+        });
+
+        historyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                crimeSelect = (Crime) historyList.getItemAtPosition(position);
+                Intent intent = new Intent(getApplicationContext(),HistoryDetailsActivity.class);
+                intent.putExtra("crimeobj", crimeSelect);
+                startActivity(intent);
             }
-        });*/
+        });
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -157,10 +194,11 @@ public class HistoryActivity extends AppCompatActivity {
 
 
 
-    public class HistoryAsync extends AsyncTask<Void, Crime, String> {
+    public class HistoryAsync extends AsyncTask<Void, JSONObject, JSONArray> {
 
         ArrayAdapter<Crime> adapter;
-        List<Crime> list;
+        JSONArray jsonArray1;
+        List<Crime> list = new ArrayList<>();
         @Override
         protected void onPreExecute() {
             adapter = (HistoryAdapter) historyList.getAdapter();
@@ -168,7 +206,7 @@ public class HistoryActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(Void... params) {
+        protected JSONArray doInBackground(Void... params) {
             try {
                 queue = Volley.newRequestQueue(getApplicationContext());
                 StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, NetworkManager.url_getHistroryLocation,
@@ -179,33 +217,15 @@ public class HistoryActivity extends AppCompatActivity {
                                     Log.d("history", response.toString());
                                     JSONObject crimejsonObject =  new JSONObject(response);
                                     JSONArray array = crimejsonObject.getJSONArray("cases");
-                                    Log.d("history",String.valueOf( array.length()));
+                                    jsonArray1 = array;
+                                   /* JSONObject jsonObject = null;
+
                                     for (int i = 0; i < array.length(); i++) {
+                                        jsonObject = array.getJSONObject(i);
 
+                                        publishProgress(jsonObject);
 
-                                        JSONObject jsonObject = array.getJSONObject(i);
-
-
-                                       Crime crime = new Crime();
-                                        crime.setId(jsonObject.getInt("id"));
-                                        crime.setType(jsonObject.getString("type"));
-                                        crime.setDate(jsonObject.getString("date"));
-                                        crime.setStatus(jsonObject.getString("status"));
-                                        crime.setLatitude(jsonObject.getString("latitude"));
-                                        crime.setLongitude(jsonObject.getString("longitude"));
-                                        publishProgress(crime);
-                                       /*  realm.beginTransaction();*/
-                                     /*   Crime crime = realm.createObject(Crime.class);
-                                        crime.setId(jsonObject.getInt("id"));
-                                        crime.setType(jsonObject.getString("type"));
-                                        crime.setDate(jsonObject.getString("date"));
-                                        crime.setStatus(jsonObject.getString("status"));
-                                        crime.setLatitude(jsonObject.getString("latitude"));
-                                        crime.setLongitude(jsonObject.getString("longitude"));
-                                        realm.commitTransaction();*/
-                                       /* Log.d("history",jsonObject.toString());
-                                        list.add(crime);*/
-                                    }
+                                    }*/
                                 } catch (Exception e) {
                                     Log.d("history", e.toString());
                                 }
@@ -227,27 +247,53 @@ public class HistoryActivity extends AppCompatActivity {
                         };
                 jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                 queue.add(jsonObjectRequest);
-                return "ok";
+                return jsonArray1;
             } catch (Exception ex) {
-                return ex.getMessage();
+                return null;
             }
-            /*for (int i=0;i<10;i++){
-                publishProgress(i);
-            }*/
 
         }
 
         @Override
-        protected void onPostExecute(String txt) {
+        protected void onPostExecute(JSONArray array) {
+            super.onPostExecute(array);
+            try {
+                JSONArray jsonArray = array;
 
+                Log.d("history",String.valueOf( jsonArray.length()));
+                for (int i = 0; i < jsonArray.length(); i++) {
+                  JSONObject  jsonObject = jsonArray.getJSONObject(i);
+                    Crime crime = new Crime();
+                    crime.setId(jsonObject.getInt("id"));
+                    crime.setStatus(jsonObject.getString("status"));
+                    crime.setDate(jsonObject.getString("date"));
+                    crime.setType(jsonObject.getString("type"));
+                    crime.setLatitude(jsonObject.getString("latitude"));
+                    crime.setLongitude(jsonObject.getString("longitude"));
+                    adapter.add(crime);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             swipeContainer.setRefreshing(false);
         }
 
         @Override
-        protected void onProgressUpdate(Crime... values) {
-            Log.d("history",String.valueOf( values[0].getId()));
-            adapter.add(values[0]);
-            //super.onProgressUpdate(values);
+        protected void onProgressUpdate(JSONObject... jsonObject) {
+           // Log.d("history",String.valueOf( values[0].getId()));
+            Crime crime = new Crime();
+            try {
+                crime.setId(jsonObject[0].getInt("id"));
+                crime.setStatus(jsonObject[0].getString("status"));
+                crime.setDate(jsonObject[0].getString("date"));
+                crime.setType(jsonObject[0].getString("type"));
+                crime.setLatitude(jsonObject[0].getString("latitude"));
+                crime.setLongitude(jsonObject[0].getString("longitude"));
+                adapter.add(crime);
+                //super.onProgressUpdate(values);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
 
@@ -267,19 +313,76 @@ public class HistoryActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             Crime crime = objects.get(position);
+
+            String crimeType = "";
             Log.d("Dummy", crime.toString());
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.listview_item, null);
-            TextView txt = (TextView) view.findViewById(R.id.txtTitle);
+            TextView txtCrimeId = (TextView) view.findViewById(R.id.txtTitle);
             TextView txtDate = (TextView) view.findViewById(R.id.txtDate);
+            TextView txtTime = (TextView) view.findViewById(R.id.txtTime);
             TextView txtType  = (TextView) view.findViewById(R.id.txtType);
-            txt.setText(String.valueOf(crime.getId()));
-            txtDate.setText(crime.getDate());
-            txtType.setText(crime.getType());
-            ImageView img = (ImageView) view.findViewById(R.id.imgIcon);
-            int res = context.getResources().getIdentifier("logo", "drawable", context.getPackageName());
-            img.setImageResource(res);
+            TextView txtStatus = (TextView) findViewById(R.id.txtStatus);
+            try {
+
+                String dateTimeCheck = new String(crime.getDate());
+                String dT[] = dateTimeCheck.split("\\s+");
+
+                ImageView img = (ImageView) view.findViewById(R.id.imgIcon);
+                int res = context.getResources().getIdentifier("logo", "drawable", context.getPackageName());
+                img.setImageResource(res);
+
+                txtCrimeId.setText("ID:" + String.valueOf(crime.getId()));
+                txtDate.setText(dT[0].toString());
+                //txtDate.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-Black.ttf"));
+                txtTime.setText("Time:" + dT[1].toString());
+                txtStatus.setText("Status:"+crime.getLatitude());
+                txtType.setText("Type:"+crime.getType());
+            }
+            catch(Exception ex){
+                Log.d("Dummy",ex.toString());
+            }
             return view;
+        }
+    }
+
+    public class HistoryCloseAsync extends AsyncTask<Crime,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Crime... crimeparams) {
+             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                         StringRequest request = new StringRequest(Request.Method.POST, NetworkManager.url_closeCase, new Response.Listener<String>() {
+                             @Override
+                             public void onResponse(String response) {
+                                 try{
+                                     JSONObject resposeJSON = new JSONObject(response);
+                                     if(resposeJSON.names().get(0).equals("status")){
+
+                                     }
+                                 }
+                                 catch(Exception ex){
+
+                                 }
+                             }
+                         }, new Response.ErrorListener() {
+                             @Override
+                             public void onErrorResponse(VolleyError error) {
+
+                                 Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                             }
+                         }) {
+                             @Override
+                             protected Map<String, String> getParams() throws AuthFailureError {
+
+                                 Map<String, String> parameters = new HashMap<String, String>();
+                                 parameters.put("caseid",String.valueOf(crimeSelect.getId()));
+                                 return parameters;
+                             }
+                         };
+                         request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                         queue.add(request);
+
+            return null;
         }
     }
 }

@@ -1,8 +1,6 @@
 package com.protectme.database;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -13,17 +11,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.protectme.HomeActivity;
-import com.protectme.LoginActivity;
 import com.protectme.dao.Crime;
 import com.protectme.dao.User;
 import com.protectme.handler.NetworkManager;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -31,11 +24,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
+import io.realm.rx.RealmObservableFactory;
 
 /**
  * Created by IshanFx on 2/15/2016.
@@ -56,7 +49,7 @@ public class RealMAdapter {
                                 .schemaVersion(2) // Must be bumped when the schema changes
                                 .deleteRealmIfMigrationNeeded()
                                 .build()
-        );
+                );
 
         queue = Volley.newRequestQueue(context);
     }
