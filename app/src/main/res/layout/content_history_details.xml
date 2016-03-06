@@ -8,6 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.protectme.HistoryDetailsActivity"
     tools:showIn="@layout/activity_history_details">
@@ -16,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="230dp"
         android:layout_marginTop="100dp"
+
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/tableLayout">
@@ -28,13 +30,15 @@
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:text="@string/casedate"
+                style="@style/tbltext"
                 android:id="@+id/txtDateShow"
                />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/txtDate"
-                android:text="New Text"
+                android:text="2015/2/3"
+                style="@style/tbltext"
                 android:layout_column="1"
                 android:layout_alignParentTop="true"
                 />
@@ -45,7 +49,7 @@
             style="@style/historydetailtable"
             android:layout_height="wrap_content">
             <TextView
-
+                style="@style/tbltext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/casetime"
@@ -55,7 +59,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/txtTime"
-                android:text="New Text"
+                android:text="6.57 PM"
+                style="@style/tbltext"
                 android:layout_column="1"
                 android:layout_alignParentTop="true"
                 />
@@ -65,6 +70,8 @@
             style="@style/historydetailtable"
             android:layout_height="wrap_content">
             <TextView
+                style="@style/tbltext"
+
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/caseid"
@@ -74,7 +81,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/txtId"
-                android:text="New Text"
+                style="@style/tbltext"
+                android:text="21"
                 android:layout_column="1"
 
                 />
@@ -88,13 +96,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/casetype"
+                style="@style/tbltext"
                 android:id="@+id/txtTypeShow"
                 />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/txtType"
-                android:text="New Text"
+                android:text="Robbery"
+                style="@style/tbltext"
                 android:layout_column="1"
 
                 />
@@ -104,7 +114,7 @@
             style="@style/historydetailtable"
             android:layout_height="wrap_content">
             <TextView
-
+                style="@style/tbltext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/casestatus"
@@ -114,7 +124,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/txtLatitude"
-                android:text="New Text"
+                android:text="Pending"
+                style="@style/tbltext"
                 android:layout_column="1"
                 android:layout_alignParentTop="true"
                 />

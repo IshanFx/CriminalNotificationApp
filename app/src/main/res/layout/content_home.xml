@@ -42,7 +42,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0"
+            android:text="6.972245"
             android:layout_gravity="center"
             style="@style/latlongstyle"
             android:id="@+id/txtLatitude"
@@ -71,7 +71,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0"
+            android:text="79.356632"
             style="@style/latlongstyle"
             android:id="@+id/txtLongitude"
             android:layout_gravity="center"
@@ -96,9 +96,10 @@
             android:background="@drawable/home_buttons"
             android:id="@+id/btnEvidence"
             android:layout_gravity="bottom"
-            android:layout_width="110dp"
+            android:layout_width="130dp"
             android:onClick="evidenceHomeAvtivity"
             android:src="@drawable/camera"
+            android:layout_marginBottom="50dp"
             />
 
         <ImageButton
@@ -107,10 +108,10 @@
             style="@style/HomeBtn"
             android:src="@drawable/run"
             android:layout_gravity="bottom"
-            android:layout_width="110dp"
+            android:layout_width="130dp"
             android:background="#E74C3C"
             android:onClick="startRealtimeTrack"
-
+            android:layout_marginBottom="50dp"
             />
         <ImageButton
             style="@style/HomeBtn"
@@ -119,8 +120,9 @@
             android:onClick="startStaticLocationTrack"
             android:background="@drawable/home_buttons"
             android:src="@drawable/marker"
-            android:layout_width="110dp"
+            android:layout_width="130dp"
             android:layout_gravity="bottom"
+            android:layout_marginBottom="50dp"
             />
 
 
