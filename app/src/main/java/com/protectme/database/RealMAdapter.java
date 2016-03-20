@@ -14,6 +14,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.protectme.dao.Crime;
+import com.protectme.dao.Family;
 import com.protectme.dao.User;
 import com.protectme.handler.NetworkManager;
 
@@ -64,8 +65,21 @@ public class RealMAdapter {
         userObject.setEmail(user.getEmail());
         userObject.setPassword(user.getPassword());
         protectRMDB.commitTransaction();
-        Log.d("Realm","Insert Sucess "+user.getId());
+        Log.d("Realm","Insert Success "+user.getId());
     }
+
+    /*
+    * Insert New family member
+    * */
+    public void insertFamily(Family family) {
+        protectRMDB.beginTransaction();
+        Family userObject = protectRMDB.createObject(Family.class);
+        userObject.setName(family.getName());
+        userObject.setNumber(family.getNumber());
+        protectRMDB.commitTransaction();
+        Log.d("Realm","Insert Success "+family.getName()+" "+family.getNumber());
+    }
+
 // Dummy Start
     public void insertDummy(){
         protectRMDB.beginTransaction();
@@ -79,7 +93,19 @@ public class RealMAdapter {
     public List<Crime> getDummy(){
         List<Crime> list = new ArrayList<>();
         RealmResults<Crime> results = protectRMDB.where(Crime.class).findAll();
-        for (Crime s:results
+        for (Crime s:results){
+            list.add(s);
+            Log.d("Dummy",s.toString());
+        }
+        return  list;
+    }
+    /*
+    * Get Family
+    * */
+    public List<Family> getFamily(){
+        List<Family> list = new ArrayList<>();
+        RealmResults<Family> results = protectRMDB.where(Family.class).findAll();
+        for (Family s:results
         ){
             list.add(s);
             Log.d("Dummy",s.toString());

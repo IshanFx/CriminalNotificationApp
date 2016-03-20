@@ -19,9 +19,9 @@
         app:showAsAction="never"
         />
     <item
-        android:id="@+id/friend_setting"
+        android:id="@+id/family_setting"
         android:orderInCategory="102"
-        android:title="@string/friend_settings"
+        android:title="@string/family_settings"
         app:showAsAction="never"
         />
     <item

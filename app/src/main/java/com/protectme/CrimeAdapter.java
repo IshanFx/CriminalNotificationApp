@@ -36,8 +36,8 @@ public class CrimeAdapter extends ArrayAdapter<Crime> {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.listview_item,null);
 
-            TextView txt = (TextView) view.findViewById(R.id.txtTitle);
-            txt.setText(crime.getId());
+           // TextView txt = (TextView) view.findViewById(R.id.txtTitle);
+          //  txt.setText(crime.getId());
             ImageView img = (ImageView) view.findViewById(R.id.imgIcon);
             int res = context.getResources().getIdentifier("icon","drawable",context.getPackageName());
             img.setImageResource(res);

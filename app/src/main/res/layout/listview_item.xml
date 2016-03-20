@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_margin="5dp"
     android:layout_gravity="center_horizontal"
-    android:layout_height="150dp">
+    android:layout_height="100dp">
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card_view"
@@ -33,29 +33,29 @@
         <TextView android:id="@+id/txtTime"
             style="@style/listStyle"
             android:layout_width="match_parent"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="40dp"
             android:layout_height="wrap_content"
             />
-        <TextView android:id="@+id/txtTitle"
+       <!-- <TextView android:id="@+id/txtTitle"
             style="@style/listStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="60dp"
-            android:layout_marginBottom="5dp" />
+            android:layout_marginBottom="5dp" />-->
 
         <TextView android:id="@+id/txtType"
             style="@style/listStyle"
             android:layout_width="match_parent"
-            android:layout_marginTop="85dp"
+            android:layout_marginTop="65dp"
             android:layout_height="wrap_content"
 
             />
-        <TextView android:id="@+id/txtStatus"
+        <!--<TextView android:id="@+id/txtStatus"
             style="@style/listStyle"
             android:layout_width="match_parent"
             android:layout_marginTop="110dp"
             android:layout_height="wrap_content"
-            />
+            />-->
     </android.support.v7.widget.CardView>
 
 

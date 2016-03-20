@@ -20,7 +20,7 @@ public class HistoryDetailsActivity extends AppCompatActivity {
         caseId = (TextView) findViewById(R.id.txtId);
         caseDate = (TextView) findViewById(R.id.txtDate);
         caseTime = (TextView) findViewById(R.id.txtTime);
-        caseStatus = (TextView) findViewById(R.id.txtStatus);
+       // caseStatus = (TextView) findViewById(R.id.txtStatus);
         caseType = (TextView) findViewById(R.id.txtType);
         Crime crimeData= (Crime) getIntent().getSerializableExtra("crimeobj");
         Log.d("Hisde", crimeData.toString());

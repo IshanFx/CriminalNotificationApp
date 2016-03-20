@@ -459,6 +459,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                         parameters.put("encodeString", encode_string);
                         parameters.put("filename", imageName);
                         parameters.put("crimeid",String.valueOf(lastCaseId));
+                        parameters.put("type","IMG");
                         /*parameters.put("status", "P");
                         parameters.put("userid", "3");
                         parameters.put("type", caseType);
@@ -528,6 +529,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                         parameters.put("encodeString", encode_string);
                         parameters.put("filename", audioName);
                         parameters.put("crimeid",String.valueOf(lastCaseId));
+                        parameters.put("type","AUD");
                     /*    parameters.put("status", "P");
                         parameters.put("userid",userID.toString());
                         parameters.put("type", caseType);

@@ -137,6 +137,11 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
             Intent settingIntent = new Intent(this, SettingsActivity.class);
             startActivity(settingIntent);
         }
+        if(id == R.id.family_setting){
+            Intent familyIntent = new Intent(this,FamilyActivity.class);
+            startActivity(familyIntent);
+        }
+
         if (id == R.id.guide_setting) {
             Intent guideIntent = new Intent(this, GuideActivity.class);
             startActivity(guideIntent);
@@ -229,19 +234,19 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void startRealtimeTrack(View view) {
-        LayoutInflater inflater = getLayoutInflater();
+       /* LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.toast_layout,
                 (ViewGroup) findViewById(R.id.toast_layout_root));
+*/
 
-
-        TextView text = (TextView) layout.findViewById(R.id.text);
+       /* TextView text = (TextView) layout.findViewById(R.id.text);
         text.setText("This is a custom toast");
 
         Toast toast = new Toast(getApplicationContext());
         toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
         toast.setDuration(Toast.LENGTH_LONG);
         toast.setView(layout);
-        toast.show();
+        toast.show();*/
         if (startRealTimeTrack) {
             startRealTimeTrack = false;
             btnKidnapClick.setBackgroundResource(R.drawable.home_button_normal);
@@ -283,8 +288,14 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                         try{
                             JSONObject resposeJSON = new JSONObject(response);
                             if(resposeJSON.names().get(0).equals("caseid")){
-                                lastCaseId = resposeJSON.getInt("caseid");
-                                Toast.makeText(getApplicationContext(),"Last case id:"+lastCaseId,Toast.LENGTH_SHORT).show();
+                                if(caseType=="K") {
+                                    lastCaseId = resposeJSON.getInt("caseid");
+                                    Toast.makeText(getApplicationContext(),"Last case id:"+lastCaseId,Toast.LENGTH_SHORT).show();
+                                }
+                                else{
+                                    Toast.makeText(getApplicationContext(),"Last case id:"+lastCaseId,Toast.LENGTH_SHORT).show();
+                                    lastCaseId = -1;
+                                }
                             }
                         }
                         catch(Exception ex){

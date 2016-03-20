@@ -11,7 +11,7 @@
     <string name="title_activity_history_details">History Details</string>
     <string name="guide_settings">Guide</string>
     <string name="history_settings">History</string>
-    <string name="friend_settings">Friends</string>
+    <string name="family_settings">Family</string>
     <string name="logout_setting">Logout</string>
 
     <string name="title_activity_login">Protect ME -Log In</string>
@@ -20,6 +20,7 @@
     <string name="recordstartbtn">Start</string>
     <string name="recordstopbtn">Stop</string>
     <string name="recorduploadbtn">Upload</string>
+
     <!-- Strings related to login -->
     <string name="prompt_email">User Name</string>
     <string name="prompt_password">Password</string>
@@ -34,6 +35,10 @@
     </string>
     <string name="title_activity_settings">Settings</string>
 
+    <!--string to Family Activity-->
+    <string name="familyname">Name</string>
+    <string name="familynumber">Number</string>
+
     <!-- string to history details - start -->
     <string name="caseid">Case ID</string>
     <string name="casestatus">Status</string>
@@ -41,6 +46,7 @@
     <string name="casetime">Time</string>
     <string name="casetype">Type</string>
     <string name="cases"></string>
+
     <!-- string to history details - end-->
     <string name="parse_app_id">D6x8K7StgtiGA2pmA2v3MkB4fJ1wpbZUBV4HCbbB</string>
     <string name="parse_client_key">bFy7KDqZ7ObW4O1sou1Yaq7NbuJkyMoSNPIZvdQO</string>
@@ -103,4 +109,5 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_evidence_select">EvidenceSelectActivity</string>
+    <string name="title_activity_family">FamilyActivity</string>
 </resources>

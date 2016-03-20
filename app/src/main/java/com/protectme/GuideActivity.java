@@ -33,7 +33,7 @@ import java.util.Map;
 
 public class GuideActivity extends AppCompatActivity {
     private Intent intent;
-   TextView txt;
+    TextView txt;
     RequestQueue queue;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +51,7 @@ public class GuideActivity extends AppCompatActivity {
             updateUI(intent);
         }
     };
+
     @Override
     public void onResume() {
         super.onResume();
@@ -90,6 +91,7 @@ public class GuideActivity extends AppCompatActivity {
         mNotificationManager.notify(1, mBuilder.build());
         txt.setText(counter);
     }
+
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
@@ -99,7 +101,6 @@ public class GuideActivity extends AppCompatActivity {
         }
         return true;
     }
-
 
     public void testvolly(View view) {
         GuideAsync guideAsync = new GuideAsync();

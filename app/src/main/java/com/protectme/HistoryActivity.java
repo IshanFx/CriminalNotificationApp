@@ -74,7 +74,7 @@ public class HistoryActivity extends AppCompatActivity {
         realMAdapter = new RealMAdapter(getApplicationContext());
         realm = RealMAdapter.protectRMDB;
         userId = realMAdapter.getUserId();
-
+        Log.d("userID",userId.toString());
 
         List<Crime> list = realMAdapter.getDummy();
 
@@ -217,15 +217,13 @@ public class HistoryActivity extends AppCompatActivity {
                                     Log.d("history", response.toString());
                                     JSONObject crimejsonObject =  new JSONObject(response);
                                     JSONArray array = crimejsonObject.getJSONArray("cases");
-                                    jsonArray1 = array;
-                                   /* JSONObject jsonObject = null;
 
+                                    JSONObject jsonObject = null;
                                     for (int i = 0; i < array.length(); i++) {
                                         jsonObject = array.getJSONObject(i);
-
                                         publishProgress(jsonObject);
 
-                                    }*/
+                                    }
                                 } catch (Exception e) {
                                     Log.d("history", e.toString());
                                 }
@@ -257,7 +255,7 @@ public class HistoryActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(JSONArray array) {
             super.onPostExecute(array);
-            try {
+            /*try {
                 JSONArray jsonArray = array;
 
                 Log.d("history",String.valueOf( jsonArray.length()));
@@ -274,7 +272,7 @@ public class HistoryActivity extends AppCompatActivity {
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
+            }*/
             swipeContainer.setRefreshing(false);
         }
 
@@ -283,12 +281,10 @@ public class HistoryActivity extends AppCompatActivity {
            // Log.d("history",String.valueOf( values[0].getId()));
             Crime crime = new Crime();
             try {
-                crime.setId(jsonObject[0].getInt("id"));
                 crime.setStatus(jsonObject[0].getString("status"));
                 crime.setDate(jsonObject[0].getString("date"));
                 crime.setType(jsonObject[0].getString("type"));
-                crime.setLatitude(jsonObject[0].getString("latitude"));
-                crime.setLongitude(jsonObject[0].getString("longitude"));
+                crime.setId(jsonObject[0].getInt("id"));
                 adapter.add(crime);
                 //super.onProgressUpdate(values);
             } catch (JSONException e) {
@@ -318,11 +314,11 @@ public class HistoryActivity extends AppCompatActivity {
             Log.d("Dummy", crime.toString());
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.listview_item, null);
-            TextView txtCrimeId = (TextView) view.findViewById(R.id.txtTitle);
+            //TextView txtCrimeId = (TextView) view.findViewById(R.id.txtTitle);
             TextView txtDate = (TextView) view.findViewById(R.id.txtDate);
             TextView txtTime = (TextView) view.findViewById(R.id.txtTime);
             TextView txtType  = (TextView) view.findViewById(R.id.txtType);
-            TextView txtStatus = (TextView) findViewById(R.id.txtStatus);
+           // TextView txtStatus = (TextView) findViewById(R.id.txtStatus);
             try {
 
                 String dateTimeCheck = new String(crime.getDate());
@@ -332,11 +328,11 @@ public class HistoryActivity extends AppCompatActivity {
                 int res = context.getResources().getIdentifier("logo", "drawable", context.getPackageName());
                 img.setImageResource(res);
 
-                txtCrimeId.setText("ID:" + String.valueOf(crime.getId()));
+               // txtCrimeId.setText("ID:" + String.valueOf(crime.getId()));
                 txtDate.setText(dT[0].toString());
                 //txtDate.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-Black.ttf"));
                 txtTime.setText("Time:" + dT[1].toString());
-                txtStatus.setText("Status:"+crime.getLatitude());
+              //  txtStatus.setText("Status:"+crime.getLatitude());
                 txtType.setText("Type:"+crime.getType());
             }
             catch(Exception ex){
