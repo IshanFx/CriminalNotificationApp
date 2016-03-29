@@ -1,15 +1,33 @@
 package com.protectme;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.protectme.dao.Crime;
+import com.protectme.handler.NetworkManager;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HistoryDetailsActivity extends AppCompatActivity {
     TextView caseId,caseTime,caseDate,caseStatus,caseType,caseLatitude;
+    static Crime crimeData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,54 +38,101 @@ public class HistoryDetailsActivity extends AppCompatActivity {
         caseId = (TextView) findViewById(R.id.txtId);
         caseDate = (TextView) findViewById(R.id.txtDate);
         caseTime = (TextView) findViewById(R.id.txtTime);
-       // caseStatus = (TextView) findViewById(R.id.txtStatus);
+        caseStatus = (TextView) findViewById(R.id.txtStatus);
         caseType = (TextView) findViewById(R.id.txtType);
-        Crime crimeData= (Crime) getIntent().getSerializableExtra("crimeobj");
-        Log.d("Hisde", crimeData.toString());
-        assignData(crimeData);
+        crimeData = (Crime) getIntent().getSerializableExtra("crimeobj");
+        Log.d("Hisde", crimeData.getStatus().toString());
+        assignData();
     }
 
-    public void assignData(Crime crime){
+    public void assignData( ){
         try {
-            String dateTimeCheck = new String(crime.getDate().toString());
+            String dateTimeCheck = new String(crimeData.getDate().toString());
        String dateTime[] = dateTimeCheck.split("\\s+");
-        /* switch (crime.getStatus().toString()) {
+         switch (crimeData.getStatus().toString()) {
             case "P":
-                crime.setStatus("Pending");
+                crimeData.setStatus("Pending");
                 break;
             case "A":
-                crime.setStatus("Active");
+                crimeData.setStatus("Assign");
                 break;
             case "C":
-                crime.setStatus("Cancelled");
+                crimeData.setStatus("Cancelled");
                 break;
             case "S":
-                crime.setStatus("Solved");
+                crimeData.setStatus("Solved");
                 break;
             default:
-                crime.setStatus("Pending");
-        }*/
-        switch (crime.getType().toString()) {
+                crimeData.setStatus("Pending");
+        }
+        switch (crimeData.getType().toString()) {
                     case "E":
-                        crime.setType("Evidence");
+                        crimeData.setType("Evidence");
                         break;
                     case "R":
-                        crime.setType("Static");
+                        crimeData.setType("Static");
                         break;
                     case "K":
-                        crime.setType("Track");
+                        crimeData.setType("Track");
                         break;
                 }
-            caseId.setText(String.valueOf(crime.getId()));
-            caseType.setText(crime.getType().toString());
-            //caseStatus.setText(crime.getStatus().toString());
+            caseId.setText(String.valueOf(crimeData.getId()));
+            caseType.setText(crimeData.getType().toString());
+            caseStatus.setText(crimeData.getStatus().toString());
             caseDate.setText(dateTime[0].toString());
             caseTime.setText(dateTime[1].toString());
-            caseLatitude.setText(crime.getLatitude());
+            caseLatitude.setText(crimeData.getLatitude());
         }
         catch (Exception ex){
             Log.d("Hisde",ex.toString());
         }
     }
 
+    public void closeCase(View view) {
+        HistoryCloseAsync historyCloseAsync = new HistoryCloseAsync();
+        historyCloseAsync.execute();
+        caseStatus.setText("Cancelled");
+    }
+
+
+
+    public class HistoryCloseAsync extends AsyncTask<Crime,Void,Void> {
+
+        @Override
+        protected Void doInBackground(Crime... crimeparams) {
+            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+            StringRequest request = new StringRequest(Request.Method.POST, NetworkManager.url_closeCase, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try{
+                        JSONObject resposeJSON = new JSONObject(response);
+                        if(resposeJSON.names().get(0).equals("status")){
+
+                        }
+                    }
+                    catch(Exception ex){
+
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+
+                    Map<String, String> parameters = new HashMap<String, String>();
+                    parameters.put("caseid",String.valueOf(crimeData.getId()));
+                    return parameters;
+                }
+            };
+            request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            queue.add(request);
+
+            return null;
+        }
+    }
 }

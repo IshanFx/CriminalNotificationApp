@@ -27,6 +27,8 @@
         android:layout_below="@+id/imgHome"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_margin="0px"
+        android:padding="0px"
         card_view:cardBackgroundColor="@color/colorPrimary"
         card_view:cardCornerRadius="0dp">
         <TextView
@@ -57,8 +59,10 @@
         android:layout_below="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_margin="0px"
+        android:padding="0px"
         card_view:cardBackgroundColor="@color/colorPrimary"
-        card_view:cardCornerRadius="5dp">
+        card_view:cardCornerRadius="0dp">
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -88,7 +92,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/card_view2"
+        android:gravity="bottom"
         >
         <ImageButton
             style="@style/HomeBtn"
@@ -96,10 +100,10 @@
             android:background="@drawable/home_buttons"
             android:id="@+id/btnEvidence"
             android:layout_gravity="bottom"
-            android:layout_width="130dp"
+            android:layout_width="120dp"
             android:onClick="evidenceHomeAvtivity"
             android:src="@drawable/camera"
-            android:layout_marginBottom="50dp"
+
             />
 
         <ImageButton
@@ -108,10 +112,10 @@
             style="@style/HomeBtn"
             android:src="@drawable/run"
             android:layout_gravity="bottom"
-            android:layout_width="130dp"
+            android:layout_width="120dp"
             android:background="#E74C3C"
             android:onClick="startRealtimeTrack"
-            android:layout_marginBottom="50dp"
+
             />
         <ImageButton
             style="@style/HomeBtn"
@@ -120,15 +124,10 @@
             android:onClick="startStaticLocationTrack"
             android:background="@drawable/home_buttons"
             android:src="@drawable/marker"
-            android:layout_width="130dp"
+            android:layout_width="120dp"
             android:layout_gravity="bottom"
-            android:layout_marginBottom="50dp"
             />
 
-
     </LinearLayout>
-
-
-
 </RelativeLayout>
 

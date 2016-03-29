@@ -22,7 +22,13 @@ public class Crime extends RealmObject implements Serializable {
         this.type = type;
     }
 
+    public String getStatus() {
+        return status;
+    }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getDate() {
         return date;
@@ -56,13 +62,7 @@ public class Crime extends RealmObject implements Serializable {
         this.longitude = longitude;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
 
 

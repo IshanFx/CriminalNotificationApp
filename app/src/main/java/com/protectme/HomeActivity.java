@@ -59,10 +59,11 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     static int startCycle = 1;
     SMSManager smsManage;
 
-    public static int lastCaseId=-1;
+    public static int lastCaseId = -1;
     RequestQueue queue;
     RealMAdapter realMAdapter;
-    public static Integer userID=0;
+    public static Integer userID = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,8 +114,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
 
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(3000);
+        mLocationRequest.setInterval(10);
+        mLocationRequest.setFastestInterval(3);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -137,8 +138,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
             Intent settingIntent = new Intent(this, SettingsActivity.class);
             startActivity(settingIntent);
         }
-        if(id == R.id.family_setting){
-            Intent familyIntent = new Intent(this,FamilyActivity.class);
+        if (id == R.id.family_setting) {
+            Intent familyIntent = new Intent(this, FamilyActivity.class);
             startActivity(familyIntent);
         }
 
@@ -151,7 +152,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
             startActivity(historyIntent);
         }
         if (id == R.id.logout_setting) {
-           // ParseUser.logOut();
+            // ParseUser.logOut();
             realMAdapter.removeUser();
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
@@ -249,12 +250,14 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         toast.show();*/
         if (startRealTimeTrack) {
             startRealTimeTrack = false;
-            btnKidnapClick.setBackgroundResource(R.drawable.home_button_normal);
+            btnKidnapClick.setBackgroundResource(R.color.colorPrimaryDark);
+           // btnKidnapClick.setBackgroundResource(R.drawable.home_button_normal);
 
             lastCaseId = -1;
         } else {
             startRealTimeTrack = true;
-            btnKidnapClick.setBackgroundResource(R.drawable.home_button_selected);
+            btnKidnapClick.setBackgroundResource( android.R.color.holo_blue_light);
+           // btnKidnapClick.setBackgroundResource(R.drawable.home_button_selected);
 
         }
     }
@@ -265,16 +268,32 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void startStaticLocationTrack(View view) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
-            txtLatitude.setText(String.valueOf(mLastLocation.getLatitude()));
-            txtLongitude.setText(String.valueOf(mLastLocation.getLongitude()));
 
-            caseType = "R";
-            LocationAsync loc = new LocationAsync();
-            loc.execute();
+        boolean isPass = true;
+        Log.d("Accuracy", "Not");
+        while (isPass) {
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+            if (mLastLocation != null) {
+                Log.d("Accuracy", "Inside");
+                Log.d("Accuracy", String.valueOf(mLastLocation.getAccuracy()));
+                if (mLastLocation.getAccuracy() < 1050) {
+                    txtLatitude.setText(String.valueOf(mLastLocation.getLatitude()));
+                    txtLongitude.setText(String.valueOf(mLastLocation.getLongitude()));
+                    Log.d("Accuracy", String.valueOf(mLastLocation.getAccuracy()));
+                    caseType = "R";
+                    LocationAsync loc = new LocationAsync();
+                    loc.execute();
+                    isPass = false;
+
+                }
+
+            }
+            if (mLastLocation == null) {
+                Log.d("Accuracy", "Not");
+            }
         }
+
     }
 
     public class LocationAsync extends AsyncTask<Void, Void, Void> {
@@ -285,20 +304,18 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                 StringRequest request = new StringRequest(Request.Method.POST, NetworkManager.url_saveCaseLocation, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        try{
+                        try {
                             JSONObject resposeJSON = new JSONObject(response);
-                            if(resposeJSON.names().get(0).equals("caseid")){
-                                if(caseType=="K") {
+                            if (resposeJSON.names().get(0).equals("caseid")) {
+                                if (caseType == "K") {
                                     lastCaseId = resposeJSON.getInt("caseid");
-                                    Toast.makeText(getApplicationContext(),"Last case id:"+lastCaseId,Toast.LENGTH_SHORT).show();
-                                }
-                                else{
-                                    Toast.makeText(getApplicationContext(),"Last case id:"+lastCaseId,Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "Last case id:" + lastCaseId, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Last case id:" + lastCaseId, Toast.LENGTH_SHORT).show();
                                     lastCaseId = -1;
                                 }
                             }
-                        }
-                        catch(Exception ex){
+                        } catch (Exception ex) {
 
                         }
                     }
@@ -314,18 +331,18 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
 
                         Map<String, String> parameters = new HashMap<String, String>();
                         parameters.put("status", "P");
-                        parameters.put("userid",userID.toString() );
+                        parameters.put("userid", userID.toString());
                         parameters.put("type", caseType);
                         parameters.put("latitude", String.valueOf(mLastLocation.getLatitude()));
                         parameters.put("longitude", String.valueOf(mLastLocation.getLongitude()));
-                        parameters.put("caseid",String.valueOf(lastCaseId));
+                        parameters.put("caseid", String.valueOf(lastCaseId));
                         return parameters;
                     }
                 };
                 request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                 queue.add(request);
             } catch (Exception ex) {
-               Log.d("AsyncError",ex.toString());
+                Log.d("AsyncError", ex.toString());
             }
             //Toast.makeText(MainActivity.this,"Finish",Toast.LENGTH_SHORT).show();
             return null;

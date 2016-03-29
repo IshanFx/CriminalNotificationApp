@@ -15,8 +15,8 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="230dp"
-        android:layout_marginTop="100dp"
+        android:layout_height="330dp"
+        android:layout_marginTop="60dp"
 
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -65,6 +65,7 @@
                 android:layout_alignParentTop="true"
                 />
         </TableRow>
+
         <TableRow
             android:layout_width="match_parent"
             style="@style/historydetailtable"
@@ -87,6 +88,7 @@
 
                 />
         </TableRow>
+
         <TableRow
             android:layout_width="match_parent"
             style="@style/historydetailtable"
@@ -109,7 +111,29 @@
 
                 />
         </TableRow>
+
         <TableRow
+            android:layout_width="match_parent"
+            style="@style/historydetailtable"
+            android:layout_height="wrap_content">
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/casestatus"
+                style="@style/tbltext"
+                android:id="@+id/txtStatusShow"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtStatus"
+                android:text="Robbery"
+                style="@style/tbltext"
+                android:layout_column="1"
+                />
+        </TableRow>
+       <!-- <TableRow
             android:layout_width="match_parent"
             style="@style/historydetailtable"
             android:layout_height="wrap_content">
@@ -147,7 +171,7 @@
                 android:id="@+id/txtLongitude"
 
                 />
-        </TableRow>
+        </TableRow>-->
     </TableLayout>
 
     <Button
@@ -156,6 +180,7 @@
         android:text="Close Case"
         android:id="@+id/btnCloseCase"
         android:background="@color/colorPrimary"
+        android:onClick="closeCase"
         android:textColor="#fff"
         android:layout_below="@+id/tableLayout"
         android:layout_alignRight="@+id/tableLayout"

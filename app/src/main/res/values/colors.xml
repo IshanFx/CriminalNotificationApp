@@ -6,6 +6,7 @@
     <color name="logingBackground">#151E26</color>
     <color name="homebackground">#FFF6E5</color>
     <!--Home Button Clours-->
+    <color name="blue">#03a9f4</color>
     <color name="normalButton">#2196F3</color>
     <color name="focusedButton">#002D40</color>
     <color name="selectedButton">#fb6d59</color>

@@ -8,6 +8,7 @@ import com.protectme.database.RealMAdapter;
 public class NetworkManager {
 
     public static final String hostIPPort  = "192.168.42.200:8082/ProtectApp/public";
+    //public static final String hostIPPort  = "192.168.42.254:8082/ProtectApp/public";
     //public static final String hostIPPort  = "protectmelkapp.xyz";
 
     public static final String url_saveCaseLocation     = "http://"+hostIPPort+"/usersavelocation";

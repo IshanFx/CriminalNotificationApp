@@ -119,6 +119,7 @@ public class HistoryActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 crimeSelect = (Crime) historyList.getItemAtPosition(position);
+
                 Intent intent = new Intent(getApplicationContext(),HistoryDetailsActivity.class);
                 intent.putExtra("crimeobj", crimeSelect);
                 startActivity(intent);
@@ -193,7 +194,9 @@ public class HistoryActivity extends AppCompatActivity {
 
 
 
-
+    /*
+    * Get History data for one user
+    * */
     public class HistoryAsync extends AsyncTask<Void, JSONObject, JSONArray> {
 
         ArrayAdapter<Crime> adapter;
@@ -282,6 +285,7 @@ public class HistoryActivity extends AppCompatActivity {
             Crime crime = new Crime();
             try {
                 crime.setStatus(jsonObject[0].getString("status"));
+
                 crime.setDate(jsonObject[0].getString("date"));
                 crime.setType(jsonObject[0].getString("type"));
                 crime.setId(jsonObject[0].getInt("id"));
@@ -295,6 +299,9 @@ public class HistoryActivity extends AppCompatActivity {
 
     }
 
+    /*
+    * Fill the list view using histrory data
+    * */
     class HistoryAdapter extends ArrayAdapter<Crime> {
         Context context;
         List<Crime> objects;
@@ -342,6 +349,9 @@ public class HistoryActivity extends AppCompatActivity {
         }
     }
 
+    /*
+    * Close the crime
+    * */
     public class HistoryCloseAsync extends AsyncTask<Crime,Void,Void>{
 
         @Override
