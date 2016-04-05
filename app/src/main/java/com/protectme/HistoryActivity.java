@@ -81,7 +81,7 @@ public class HistoryActivity extends AppCompatActivity {
         crimeAdapter = new HistoryAdapter(this, 1, list);
         historyList = (ListView) findViewById(android.R.id.list);
         historyList.setAdapter(crimeAdapter);
-
+        new HistoryAsync().execute();
         /*ArrayAdapter<String> adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,new ArrayList());
         historyList.setAdapter(adapter);
         new HistoryAsync().execute();*/
@@ -144,6 +144,7 @@ public class HistoryActivity extends AppCompatActivity {
 
     }
 
+
     public void getHistoryData() {
 
         /*criminalList.add("Case 1 \nLocation :79,000,6 \nTime:12:30 Data:10/1/2016");
@@ -191,8 +192,6 @@ public class HistoryActivity extends AppCompatActivity {
         }
 
     }
-
-
 
     /*
     * Get History data for one user
@@ -340,6 +339,17 @@ public class HistoryActivity extends AppCompatActivity {
                 //txtDate.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-Black.ttf"));
                 txtTime.setText("Time:" + dT[1].toString());
               //  txtStatus.setText("Status:"+crime.getLatitude());
+                switch (crime.getType().toString()) {
+                    case "E":
+                        crime.setType("Evidence");
+                        break;
+                    case "R":
+                        crime.setType("Static");
+                        break;
+                    case "K":
+                        crime.setType("Track");
+                        break;
+                }
                 txtType.setText("Type:"+crime.getType());
             }
             catch(Exception ex){

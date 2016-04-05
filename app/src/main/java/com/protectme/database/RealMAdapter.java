@@ -100,7 +100,7 @@ public class RealMAdapter {
         return  list;
     }
     /*
-    * Get Family
+    * Get Family Numbers
     * */
     public List<Family> getFamily(){
         List<Family> list = new ArrayList<>();
@@ -112,6 +112,17 @@ public class RealMAdapter {
         }
         return  list;
     }
+
+    public void removeFamily(){
+        RealmResults<Family> results = protectRMDB.where(Family.class).findAll();
+        protectRMDB.beginTransaction();
+        results.clear();
+        protectRMDB.commitTransaction();
+    }
+
+    /*
+    * Check Code
+    * */
     public void removeDummy(){
         RealmResults<Crime> results = protectRMDB.where(Crime.class).findAll();
         protectRMDB.beginTransaction();

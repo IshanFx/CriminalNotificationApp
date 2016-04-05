@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="home_btn_width">108dp</dimen>
+    <dimen name="home_btn_height">130dp</dimen>
+
+    <dimen name="upload_btn_margin">28dp</dimen>
+</resources>

@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -26,7 +27,7 @@ public class FamilyActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeContainer;
     FamilyAdapter familyAdapter;
     ListView familyList;
-
+    List<Family> list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +84,8 @@ public class FamilyActivity extends AppCompatActivity {
             }
         });
 
-        List<Family> list = realMAdapter.getFamily();
+
+        list = realMAdapter.getFamily();
 
         // depHomeAdapter = new DepHomeAdapter(this, 1, list);
         familyAdapter = new FamilyAdapter(this, 1, list);
@@ -96,7 +98,11 @@ public class FamilyActivity extends AppCompatActivity {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-
+                list = realMAdapter.getFamily();
+                familyAdapter = new FamilyAdapter(getApplicationContext(), 1, list);
+                familyList = (ListView) findViewById(android.R.id.list);
+                familyList.setAdapter(familyAdapter);
+                swipeContainer.setRefreshing(false);
             }
         });
 
@@ -105,6 +111,14 @@ public class FamilyActivity extends AppCompatActivity {
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
+
+        familyList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                new RealMAdapter(getApplicationContext()).removeFamily();
+                return true;
+            }
+        });
     }
 
 

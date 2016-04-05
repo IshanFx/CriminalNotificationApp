@@ -8,9 +8,9 @@
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card_view"
         android:layout_gravity="center"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="5dp"
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:elevation="20dp"
@@ -24,14 +24,14 @@
             android:layout_gravity="center_vertical"
              />
         <TextView android:id="@+id/txtDate"
-            style="@style/listStyle"
+            style="@style/listStylehistory"
             android:textSize="25dp"
             android:layout_width="match_parent"
             android:layout_marginTop="2dp"
             android:layout_height="wrap_content"
             />
         <TextView android:id="@+id/txtTime"
-            style="@style/listStyle"
+            style="@style/listStylehistory"
             android:layout_width="match_parent"
             android:layout_marginTop="40dp"
             android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
             android:layout_marginBottom="5dp" />-->
 
         <TextView android:id="@+id/txtType"
-            style="@style/listStyle"
+            style="@style/listStylehistory"
             android:layout_width="match_parent"
             android:layout_marginTop="65dp"
             android:layout_height="wrap_content"

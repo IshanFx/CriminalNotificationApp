@@ -11,7 +11,7 @@
     tools:showIn="@layout/activity_evidence_select">
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="330dp"
+        android:layout_height="300dp"
         android:id="@+id/imageView1"
         android:layout_margin="10dp"
         android:background="@color/common_action_bar_splitter"
@@ -32,7 +32,7 @@
         android:text="@string/videobtn"
         style="@style/recordbtn"
         android:src="@drawable/video"
-        android:background="@color/colorPrimary"
+        android:background="@color/cardview_dark_background"
         android:id="@+id/button2"
         android:onClick="startVideo"
         android:layout_below="@+id/imageView1"
@@ -54,10 +54,9 @@
         android:id="@+id/btnUploadRecord"
         android:onClick="uploadEvidence"
         android:src="@drawable/upload"
-        android:layout_below="@+id/button2"
+        android:layout_below="@+id/button"
+        android:layout_marginTop="@dimen/upload_btn_margin"
         android:background="@drawable/home_buttons"
-        android:layout_marginTop="32dp"
-
         android:layout_width="match_parent"
         />
 

@@ -100,7 +100,7 @@
             android:background="@drawable/home_buttons"
             android:id="@+id/btnEvidence"
             android:layout_gravity="bottom"
-            android:layout_width="120dp"
+            android:layout_width="@dimen/home_btn_width"
             android:onClick="evidenceHomeAvtivity"
             android:src="@drawable/camera"
 
@@ -112,7 +112,7 @@
             style="@style/HomeBtn"
             android:src="@drawable/run"
             android:layout_gravity="bottom"
-            android:layout_width="120dp"
+            android:layout_width="@dimen/home_btn_width"
             android:background="#E74C3C"
             android:onClick="startRealtimeTrack"
 
@@ -124,7 +124,7 @@
             android:onClick="startStaticLocationTrack"
             android:background="@drawable/home_buttons"
             android:src="@drawable/marker"
-            android:layout_width="120dp"
+            android:layout_width="@dimen/home_btn_width"
             android:layout_gravity="bottom"
             />
 

@@ -3,9 +3,10 @@
     android:id="@+id/toast_layout_root"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="50dp"
+    android:layout_margin="10dp"
     android:padding="8dp"
-    android:background="#F2784B"
+    android:background="@color/optionalCol"
     >
     <ImageView android:src="@drawable/happy"
         android:layout_width="wrap_content"
@@ -15,6 +16,8 @@
     <TextView android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:text="Case Opened"
         android:textColor="#FFF"
         />
 </LinearLayout>

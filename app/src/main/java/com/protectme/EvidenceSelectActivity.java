@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -37,6 +38,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.protectme.dao.Crime;
 import com.protectme.database.RealMAdapter;
 import com.protectme.handler.NetworkManager;
 
@@ -89,6 +91,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     RealMAdapter realMAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,15 +153,17 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri); // set the image file name
         startActivityForResult(intent, CAPTURE_IMAGE);
     }
+
     /*
     * Video Recording Listner
     */
+
     public void startVideo(View view) {
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         fileUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO); // create a file to save the image
         videoUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, 10000);
+        //intent.putExtra(MediaStore.EXTRA_OUTPUT, 10000);
         startActivityForResult(intent, CAPTURE_VIDEO);
     }
 
@@ -245,6 +250,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                             .setNotificationConfig(new UploadNotificationConfig())
                             .setMaxRetries(2)
                             .startUpload();
+            videoUri =null;
         } catch (Exception exc) {
             Log.e("AndroidUploadService", exc.getMessage());
         }
@@ -272,24 +278,26 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_" + timeStamp + ".jpg");
+                    "IMG_" + timeStamp +"_"+userID+ ".jpg");
 
         }
         else if (type == MEDIA_TYPE_VIDEO) {
+           /* mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "MOV_0015.mp4");*/
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "MOV_0015.mp4");
-           // videoName = "VID_"+timeStamp+".mp4";
-            videoName = "MOV_0015.mp4";
+                    "VID_" + timeStamp +"_"+userID+ ".mp4");
+            videoName = "VID_"+timeStamp+"_"+userID+".mp4";
+            //videoName = "MOV_0015.mp4";
         }
         else if (type == MEDIA_TYPE_AUDIO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "AUD_" + timeStamp + ".mp3");
-            audioName = "AUD_" + timeStamp + ".mp3";
+                    "AUD_" + timeStamp +"_"+userID+ ".mp3");
+            audioName = "AUD_" + timeStamp +"_"+userID+ ".mp3";
         } else {
             return null;
         }
         //set the image name
-        imageName = "IMG" + timeStamp + ".jpg";
+        imageName = "IMG_" + timeStamp +"_"+userID+".jpg";
         return mediaFile;
     }
 
@@ -328,6 +336,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
             if (videoUri!=null) {
                 uploadMultipart(getApplicationContext());
             }
+            customeToast(view);
         } catch (Exception e) {
             Log.d("evicence",e.getMessage().toString());
         }
@@ -480,8 +489,10 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         @Override
         protected void onPostExecute(Void aVoid) {
             uploadProgress.setVisibility(View.INVISIBLE);
+            imageUri = null;
         }
     }
+
     public class AudioAsync extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -550,8 +561,10 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         @Override
         protected void onPostExecute(Void aVoid) {
             uploadProgress.setVisibility(View.INVISIBLE);
+            voiceUri = null;
         }
     }
+
     private class VideoAsync extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -624,5 +637,25 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         protected void onPostExecute(Void aVoid) {
             uploadProgress.setVisibility(View.INVISIBLE);
         }
+    }
+
+    public void customeToast(View view){
+        Snackbar snackbar = Snackbar.make(view, "Case Opened.Uploaded Evidence",
+                Snackbar.LENGTH_LONG);
+        View snackBarView = snackbar.getView();
+
+        snackBarView.setBackgroundColor(getResources().getColor(R.color.snackbar));
+        snackbar.show();
+
+     /*   LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.toast_layout,
+                (ViewGroup) findViewById(R.id.toast_layout_root));
+
+        TextView text = (TextView) layout.findViewById(R.id.text);
+        Toast toast = new Toast(getApplicationContext());
+        toast.setGravity(Gravity.TOP, 0, 12);
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setView(layout);
+        toast.show();*/
     }
 }

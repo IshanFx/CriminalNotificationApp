@@ -13,4 +13,5 @@
     <color name="layoutback1">#E2E3DF</color>
     <!--Optional Colours-->
     <color name="optionalCol">#3498DB</color>
+    <color name="snackbar">#1abc9c</color>
 </resources>
