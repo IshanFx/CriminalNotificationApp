@@ -40,7 +40,9 @@ import com.android.volley.toolbox.Volley;
 import com.protectme.dao.User;
 import com.protectme.database.RealMAdapter;
 import com.protectme.handler.NetworkManager;
+import com.protectme.handler.VariableManager;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -82,7 +84,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
+    private  View btnView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +109,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                btnView = view;
                 attemptLogin();
             }
         });
@@ -323,7 +326,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             Log.d("Realm", "second login");
             launchHomeActivity();
         } else {
-            new UserLoginTask(mEmail,mPassword).execute();
+            //new UserLoginTask(mEmail,mPassword).execute();
+            newUserLogin(mEmail, mPassword);
+
             Log.d("Realm", "first login");
 
         }
@@ -344,6 +349,58 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         showProgress(false);
         return isLoginPass;
+    }
+
+    private synchronized void newUserLogin(final String mEmail, final String mPassword) {
+        try {
+            queue = Volley.newRequestQueue(getApplicationContext());
+            StringRequest request = new StringRequest(Request.Method.POST, NetworkManager.url_getLoginVerify, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        JSONObject resposeJSON = new JSONObject(response);
+                        Log.d("Realm", resposeJSON.toString());
+                        if (Boolean.valueOf(resposeJSON.getString("check"))) {
+                            Log.d("Realm", "available");
+                            isUserAvailable = true;
+                            user.setId(resposeJSON.getInt("userid"));
+                            realMAdapter.removeUser();
+                            realMAdapter.insertUser(user);
+                            new VariableManager().customeToast(btnView, "User Found", 1);
+                            launchHomeActivity();
+                        } else {
+                            new VariableManager().customeToast(btnView, "User Not Found", 0);
+                            isUserAvailable = false;
+                        }
+
+                    }
+                    catch (JSONException ex){
+                        Log.d("Realm", ex.toString());
+                        new VariableManager().customeToast(btnView, "Check Data Connection", 0);
+                        isUserAvailable = false;
+                    }
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> parameters = new HashMap<String, String>();
+                    parameters.put("username",mEmail);
+                    parameters.put("password", mPassword);
+                    return parameters;
+                }
+            };
+            //request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            queue.add(request);
+
+        } catch (Exception e) {
+            Log.d("Realm", e.toString());
+        }
     }
 
     private void launchHomeActivity() {
@@ -496,6 +553,30 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+
+    public void customeToast(String msg, int status) {
+        Snackbar snackbar = Snackbar.make(btnView, msg,
+                Snackbar.LENGTH_LONG);
+        View snackBarView = snackbar.getView();
+        if (status == 1) {
+            snackBarView.setBackgroundColor(getResources().getColor(R.color.snackbar));
+        } else
+            snackBarView.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+
+        snackbar.show();
+
+       /* LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.toast_layout,
+                (ViewGroup) findViewById(R.id.toast_layout_root));
+
+        TextView text = (TextView) layout.findViewById(R.id.text);
+        Toast toast = new Toast(getApplicationContext());
+        toast.setGravity(Gravity.TOP, 0, 12);
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setView(layout);
+        toast.show();*/
     }
 }
 

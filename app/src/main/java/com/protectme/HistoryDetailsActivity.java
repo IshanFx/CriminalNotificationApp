@@ -19,6 +19,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.protectme.dao.Crime;
 import com.protectme.handler.NetworkManager;
+import com.protectme.handler.VariableManager;
 
 import org.json.JSONObject;
 
@@ -28,7 +29,7 @@ import java.util.Map;
 public class HistoryDetailsActivity extends AppCompatActivity {
     TextView caseId,caseTime,caseDate,caseStatus,caseType,caseLatitude;
     static Crime crimeData;
-
+    View btnSelect;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +90,7 @@ public class HistoryDetailsActivity extends AppCompatActivity {
     }
 
     public void closeCase(View view) {
+        btnSelect = view;
         HistoryCloseAsync historyCloseAsync = new HistoryCloseAsync();
         historyCloseAsync.execute();
         caseStatus.setText("Cancelled");
@@ -105,20 +107,24 @@ public class HistoryDetailsActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(String response) {
                     try{
+
                         JSONObject resposeJSON = new JSONObject(response);
                         if(resposeJSON.names().get(0).equals("status")){
-
+                            new VariableManager().customeToast(btnSelect, "Case Closed", 1);
+                        }
+                        else{
+                            new VariableManager().customeToast(btnSelect, "Case Not Closed", 0);
                         }
                     }
                     catch(Exception ex){
-
+                        new VariableManager().customeToast(btnSelect, "Case Not Closed", 0);
                     }
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
 
-                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                    new VariableManager().customeToast(btnSelect, "Check Data Connection", 0);
                 }
             }) {
                 @Override

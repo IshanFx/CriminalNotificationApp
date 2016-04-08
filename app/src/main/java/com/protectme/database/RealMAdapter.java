@@ -108,7 +108,7 @@ public class RealMAdapter {
         for (Family s:results
         ){
             list.add(s);
-            Log.d("Dummy",s.toString());
+            Log.d("Dummy",s.getNumber().toString());
         }
         return  list;
     }

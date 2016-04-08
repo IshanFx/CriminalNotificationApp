@@ -3,6 +3,7 @@ package com.protectme.handler;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 
 import com.protectme.database.RealMAdapter;
 
@@ -12,7 +13,7 @@ import com.protectme.database.RealMAdapter;
 public class NetworkManager {
 
     public static final String hostIPPort  = "192.168.42.200:8082/ProtectApp/public";
-    //public static final String hostIPPort  = "192.168.42.254:8082/ProtectApp/public";
+    //public static final String hostIPPort  = "192.168.99.75:8082/ProtectApp/public";
     //public static final String hostIPPort  = "protectmelkapp.xyz";
 
     public static final String url_saveCaseLocation     = "http://"+hostIPPort+"/usersavelocation";
@@ -33,7 +34,12 @@ public class NetworkManager {
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
+                activeNetwork.isConnected();
+        if(isConnected)
+            Log.d("Network","Connected");
+        else
+            Log.d("Network","Not Connected");
+
         return isConnected;
     }
 

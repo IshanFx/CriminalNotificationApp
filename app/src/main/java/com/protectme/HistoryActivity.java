@@ -34,6 +34,7 @@ import com.android.volley.toolbox.Volley;
 import com.protectme.dao.Crime;
 import com.protectme.database.RealMAdapter;
 import com.protectme.handler.NetworkManager;
+import com.protectme.handler.VariableManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,6 +62,7 @@ public class HistoryActivity extends AppCompatActivity {
     ArrayAdapter<Crime> crimeAdapter;
     Integer crimeId=0;
     Crime crimeSelect;
+    View btnSelect;
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +92,7 @@ public class HistoryActivity extends AppCompatActivity {
         historyList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                btnSelect = view;
                 crimeSelect = (Crime) historyList.getItemAtPosition(position);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(HistoryActivity.this);
@@ -99,7 +102,7 @@ public class HistoryActivity extends AppCompatActivity {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         new HistoryCloseAsync().execute();
-                        Toast.makeText(getApplicationContext(), "OK", Toast.LENGTH_SHORT).show();
+
                     }
                 });
                 builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -370,21 +373,25 @@ public class HistoryActivity extends AppCompatActivity {
                          StringRequest request = new StringRequest(Request.Method.POST, NetworkManager.url_closeCase, new Response.Listener<String>() {
                              @Override
                              public void onResponse(String response) {
+
                                  try{
                                      JSONObject resposeJSON = new JSONObject(response);
                                      if(resposeJSON.names().get(0).equals("status")){
-
+                                         new VariableManager().customeToast(btnSelect, "Case Closed", 1);
+                                     }
+                                     else{
+                                         new VariableManager().customeToast(btnSelect, "Case Not Closed", 0);
                                      }
                                  }
                                  catch(Exception ex){
-
+                                     new VariableManager().customeToast(btnSelect, "Case Not Closed", 0);
                                  }
                              }
                          }, new Response.ErrorListener() {
                              @Override
                              public void onErrorResponse(VolleyError error) {
 
-                                 Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                                 new VariableManager().customeToast(btnSelect, "Check Data Connection", 0);
                              }
                          }) {
                              @Override
@@ -401,4 +408,5 @@ public class HistoryActivity extends AppCompatActivity {
             return null;
         }
     }
+
 }

@@ -39,6 +39,7 @@ import com.google.android.gms.location.LocationServices;
 import com.protectme.database.RealMAdapter;
 import com.protectme.handler.NetworkManager;
 import com.protectme.handler.SMSManager;
+import com.protectme.handler.VariableManager;
 
 import org.json.JSONObject;
 
@@ -105,23 +106,11 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//
-//        mGoogleApiClient.connect();
-//        if (mGoogleApiClient.isConnected()) {
-//            Toast.makeText(this,"Connected",Toast.LENGTH_SHORT).show();
-//        }
-//        else {
-//            Toast.makeText(this,"Not connected",Toast.LENGTH_SHORT).show();
-//        }
-//    }
 
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10);
-        mLocationRequest.setFastestInterval(3);
+        mLocationRequest.setInterval(5000);
+        mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -139,26 +128,18 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-      /*  if (id == R.id.settings) {
-            Intent settingIntent = new Intent(this, SettingsActivity.class);
-            startActivity(settingIntent);
-        }*/
+
         if (id == R.id.family_setting) {
             Intent familyIntent = new Intent(this, FamilyActivity.class);
             startActivity(familyIntent);
         }
 
-        /*if (id == R.id.guide_setting) {
-            Intent guideIntent = new Intent(this, GuideActivity.class);
-            startActivity(guideIntent);
-        }*/
+
         if (id == R.id.history_setting) {
             Intent historyIntent = new Intent(this, HistoryActivity.class);
             startActivity(historyIntent);
         }
         if (id == R.id.logout_setting) {
-            // ParseUser.logOut();
             realMAdapter.removeUser();
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
@@ -179,7 +160,6 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
-
         updateUI();
 
     }
@@ -219,7 +199,6 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-
     /*
     * Stop the location tacking.
     * */
@@ -258,14 +237,14 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         if (startRealTimeTrack) {
             startRealTimeTrack = false;
             btnKidnapClick.setBackgroundResource(R.color.colorPrimaryDark);
-           // btnKidnapClick.setBackgroundResource(R.drawable.home_button_normal);
+            // btnKidnapClick.setBackgroundResource(R.drawable.home_button_normal);
             //customeToast();
             lastCaseId = -1;
         } else {
             startRealTimeTrack = true;
             btnKidnapClick.setBackgroundResource(android.R.color.holo_blue_light);
 
-           // btnKidnapClick.setBackgroundResource(R.drawable.home_button_selected);
+            // btnKidnapClick.setBackgroundResource(R.drawable.home_button_selected);
 
         }
     }
@@ -279,32 +258,33 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         staticLocation = view;
         boolean isPass = true;
         Log.d("Accuracy", "Not");
-       // while (isPass) {
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
+        // while (isPass) {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
 
-            if (mLastLocation != null) {
-                Log.d("Accuracy", "Inside");
+        if (mLastLocation != null) {
+            Log.d("Accuracy", "Inside");
+            Log.d("Accuracy", String.valueOf(mLastLocation.getAccuracy()));
+            if (mLastLocation.getAccuracy() < 1050) {
+                txtLatitude.setText(String.valueOf(mLastLocation.getLatitude()));
+                txtLongitude.setText(String.valueOf(mLastLocation.getLongitude()));
                 Log.d("Accuracy", String.valueOf(mLastLocation.getAccuracy()));
-                if (mLastLocation.getAccuracy() < 1050) {
-                    txtLatitude.setText(String.valueOf(mLastLocation.getLatitude()));
-                    txtLongitude.setText(String.valueOf(mLastLocation.getLongitude()));
-                    Log.d("Accuracy", String.valueOf(mLastLocation.getAccuracy()));
-                    caseType = "R";
-                   // if(NetworkManager.checkNetwork(this)) {
-                        LocationAsync loc = new LocationAsync();
-                        loc.execute();
-                  //  }
-                  //  else{ Log.d("Accuracy", "Fail Net");
+                caseType = "R";
 
-                        //new SMSManager().sendSMS(mLastLocation.getLatitude()+" "+mLastLocation.getLongitude(),this);
-                   // }
-                    isPass = false;
+                if(NetworkManager.checkNetwork(getApplicationContext())){
+                    LocationAsync loc = new LocationAsync();
+                    loc.execute();
                 }
+                else{
+                    new SMSManager().sendSMS("Latitude:"+mLastLocation.getLatitude()+"Longitude:"+mLastLocation.getLongitude(),getApplicationContext());
+                }
+
+                isPass = false;
             }
-            if (mLastLocation == null) {
-                Log.d("Accuracy", "Not");
-            }
+        }
+        if (mLastLocation == null) {
+            Log.d("Accuracy", "Not");
+        }
         //}
 
     }
@@ -322,15 +302,17 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                             if (resposeJSON.names().get(0).equals("caseid")) {
                                 if (caseType == "K") {
                                     lastCaseId = resposeJSON.getInt("caseid");
-                                    customeToast();
+                                    new VariableManager().customeToast(staticLocation, "Case Opened", 1);
                                     //Toast.makeText(getApplicationContext(), "Last case id:" + lastCaseId, Toast.LENGTH_SHORT).show();
                                 } else {
-                                    customeToast();
+                                    new VariableManager().customeToast(staticLocation, "Case Opened", 1);
+
                                     //Toast.makeText(getApplicationContext(), "Last case id:" + lastCaseId, Toast.LENGTH_SHORT).show();
                                     lastCaseId = -1;
                                 }
                             }
                         } catch (Exception ex) {
+                            new VariableManager().customeToast(staticLocation, "Case Not Opened,Check Network", 0);
 
                         }
                     }
@@ -338,7 +320,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                     @Override
                     public void onErrorResponse(VolleyError error) {
 
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                       new VariableManager().customeToast(staticLocation,"Check Data Connection",0);
                     }
                 }) {
                     @Override
@@ -354,10 +336,10 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                         return parameters;
                     }
                 };
-                request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                request.setRetryPolicy(new DefaultRetryPolicy(20000, 3, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                 queue.add(request);
             } catch (Exception ex) {
-                Log.d("AsyncError", ex.toString());
+                new VariableManager().customeToast(staticLocation, "Case Not Opened", 0);
             }
             //Toast.makeText(MainActivity.this,"Finish",Toast.LENGTH_SHORT).show();
             return null;
@@ -365,23 +347,5 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
-    public void customeToast(){
-        Snackbar snackbar = Snackbar.make(staticLocation, "Case Opened",
-                Snackbar.LENGTH_LONG);
-        View snackBarView = snackbar.getView();
 
-        snackBarView.setBackgroundColor(getResources().getColor(R.color.snackbar));
-        snackbar.show();
-
-     /*   LayoutInflater inflater = getLayoutInflater();
-        View layout = inflater.inflate(R.layout.toast_layout,
-                (ViewGroup) findViewById(R.id.toast_layout_root));
-
-        TextView text = (TextView) layout.findViewById(R.id.text);
-        Toast toast = new Toast(getApplicationContext());
-        toast.setGravity(Gravity.TOP, 0, 12);
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.setView(layout);
-        toast.show();*/
-    }
 }

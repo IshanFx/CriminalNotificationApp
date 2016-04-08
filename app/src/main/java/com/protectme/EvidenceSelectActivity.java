@@ -143,7 +143,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     public void getLastLocation() {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-       Log.d("Evidence","Latitude"+String.valueOf(mLastLocation.getLatitude())+"Longitude"+String.valueOf(mLastLocation.getLongitude()));
+        Log.d("Evidence","Latitude"+String.valueOf(mLastLocation.getLatitude())+"Longitude"+String.valueOf(mLastLocation.getLongitude()));
     }
 
     public void startcapture(View view) {
@@ -265,7 +265,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
      */
     private static File getOutputMediaFile(int type) {
         File mediaStorageDir = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "ProtectMEAPP");
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "ProtectMEAPP");
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 Log.d("MyCameraApp", "failed to create directory");
