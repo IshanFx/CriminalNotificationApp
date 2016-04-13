@@ -81,7 +81,7 @@ public class HistoryActivity extends AppCompatActivity {
         List<Crime> list = realMAdapter.getDummy();
 
         crimeAdapter = new HistoryAdapter(this, 1, list);
-        historyList = (ListView) findViewById(android.R.id.list);
+        historyList = (ListView) findViewById(R.id.historylist);
         historyList.setAdapter(crimeAdapter);
         new HistoryAsync().execute();
         /*ArrayAdapter<String> adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,new ArrayList());
@@ -350,7 +350,7 @@ public class HistoryActivity extends AppCompatActivity {
                         crime.setType("Static");
                         break;
                     case "K":
-                        crime.setType("Track");
+                        crime.setType("Real Time");
                         break;
                 }
                 txtType.setText("Type:"+crime.getType());

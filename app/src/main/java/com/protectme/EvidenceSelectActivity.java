@@ -41,6 +41,7 @@ import com.google.android.gms.location.LocationServices;
 import com.protectme.dao.Crime;
 import com.protectme.database.RealMAdapter;
 import com.protectme.handler.NetworkManager;
+import com.protectme.handler.VariableManager;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadNotificationConfig;
@@ -63,7 +64,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     public static final int MEDIA_TYPE_AUDIO = 3;
-
+    public final String TAG_EVIDENCE ="";
     public static boolean isRecordStart=false;
     public static String audioName = "";
     public static String videoName = "";
@@ -91,7 +92,8 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     RealMAdapter realMAdapter;
-
+    View upload_btn_view;
+    View record_btn_view;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,9 +143,11 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     }
 
     public void getLastLocation() {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        Log.d("Evidence","Latitude"+String.valueOf(mLastLocation.getLatitude())+"Longitude"+String.valueOf(mLastLocation.getLongitude()));
+        if(mLastLocation==null) {
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+            Log.d(TAG_EVIDENCE, "Latitude" + String.valueOf(mLastLocation.getLatitude()) + "Longitude" + String.valueOf(mLastLocation.getLongitude()));
+        }
     }
 
     public void startcapture(View view) {
@@ -168,6 +172,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     }
 
     public void startVoiceRecord(View view) {
+        record_btn_view = view;
         try {
             if(!isRecordStart) {
                 fileUri = getOutputMediaFileUri(MEDIA_TYPE_AUDIO);
@@ -202,7 +207,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         myAudioRecorder.release();
         myAudioRecorder = null;
         isRecordStart = false;
-        Toast.makeText(getApplicationContext(), "Audio recorded successfully", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Recording Stopped", Toast.LENGTH_LONG).show();
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -252,7 +257,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                             .startUpload();
             videoUri =null;
         } catch (Exception exc) {
-            Log.e("AndroidUploadService", exc.getMessage());
+            Log.e(TAG_EVIDENCE, exc.getMessage());
         }
     }
     /*Path create start */
@@ -306,6 +311,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
     /*Voice record methods -  start*/
 
     public void uploadEvidence(View view) {
+        upload_btn_view = view;
        /* mediaPlayer = new MediaPlayer();
         try {
             mediaPlayer.setDataSource(voiceUri.getPath());
@@ -323,22 +329,27 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         if(lastCaseId==-1) {
             sendLocationData();
         }
-        Log.d("evicence","Save Extra");
+        Log.e(TAG_EVIDENCE, "Save Extra");
         try {
-            if(imageUri!=null){
-                new CaptureAsync().execute();
-              //  imageUri = null;
+            if(mLastLocation!=null) {
+                if (imageUri != null) {
+                    new CaptureAsync().execute();
+                    //  imageUri = null;
+                }
+                if (voiceUri != null) {
+                    new AudioAsync().execute();
+                    // voiceUri = null;
+                }
+                if (videoUri != null) {
+                    uploadMultipart(getApplicationContext());
+                }
             }
-            if (voiceUri!=null) {
-               new AudioAsync().execute();
-               // voiceUri = null;
+            else {
+                new VariableManager().customeToast(upload_btn_view,"Check GPS.Cannot submit",0);
             }
-            if (videoUri!=null) {
-                uploadMultipart(getApplicationContext());
-            }
-            customeToast(view);
+
         } catch (Exception e) {
-            Log.d("evicence",e.getMessage().toString());
+            Log.d(TAG_EVIDENCE,e.getMessage().toString());
         }
     }
 
@@ -457,7 +468,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                     @Override
                     public void onErrorResponse(VolleyError error) {
 
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e(TAG_EVIDENCE, error.getMessage());
                     }
                 }) {
                     @Override
@@ -480,7 +491,7 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                 };
                 queue.add(request);
             } catch (Exception ex) {
-                // Toast.makeText(MainActivity.this,"Errr",Toast.LENGTH_SHORT).show();
+                Log.e(TAG_EVIDENCE, ex.getMessage());
             }
             //Toast.makeText(MainActivity.this,"Finish",Toast.LENGTH_SHORT).show();
             return null;
@@ -553,7 +564,8 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
                 queue.add(request);
 
             } catch (Exception ex) {
-                Log.d("evi",ex.getMessage().toString());
+                Log.e(TAG_EVIDENCE, ex.getMessage());
+
             }
             return null;
         }
@@ -639,23 +651,5 @@ public class EvidenceSelectActivity extends AppCompatActivity implements GoogleA
         }
     }
 
-    public void customeToast(View view){
-        Snackbar snackbar = Snackbar.make(view, "Case Opened.Uploaded Evidence",
-                Snackbar.LENGTH_LONG);
-        View snackBarView = snackbar.getView();
 
-        snackBarView.setBackgroundColor(getResources().getColor(R.color.snackbar));
-        snackbar.show();
-
-     /*   LayoutInflater inflater = getLayoutInflater();
-        View layout = inflater.inflate(R.layout.toast_layout,
-                (ViewGroup) findViewById(R.id.toast_layout_root));
-
-        TextView text = (TextView) layout.findViewById(R.id.text);
-        Toast toast = new Toast(getApplicationContext());
-        toast.setGravity(Gravity.TOP, 0, 12);
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.setView(layout);
-        toast.show();*/
-    }
 }

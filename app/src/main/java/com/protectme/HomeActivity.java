@@ -271,13 +271,13 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                 Log.d("Accuracy", String.valueOf(mLastLocation.getAccuracy()));
                 caseType = "R";
 
-                if(NetworkManager.checkNetwork(getApplicationContext())){
+                //if(NetworkManager.checkNetwork(getApplicationContext())){
                     LocationAsync loc = new LocationAsync();
                     loc.execute();
-                }
-                else{
+               // }
+              //  else{
                     new SMSManager().sendSMS("Latitude:"+mLastLocation.getLatitude()+"Longitude:"+mLastLocation.getLongitude(),getApplicationContext());
-                }
+              //  }
 
                 isPass = false;
             }
