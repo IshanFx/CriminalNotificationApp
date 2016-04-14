@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -41,7 +42,9 @@ import com.protectme.handler.NetworkManager;
 import com.protectme.handler.SMSManager;
 import com.protectme.handler.VariableManager;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -50,7 +53,8 @@ import java.util.Locale;
 import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
-    View staticLocation;
+    View btn_selected
+            ;
     LocationManager locationManager;
     public static Location mLastLocation, mLastStaticLocation;
     public static String caseType = "";
@@ -61,6 +65,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     ImageButton btnKidnapClick;
     ImageButton btnRobberyClick;
     ImageButton btnEvidenceClick;
+    TextView txtaddress;
     TextView txtLatitude;
     TextView txtLongitude;
     static int startCycle = 1;
@@ -82,6 +87,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         btnRobberyClick = (ImageButton) findViewById(R.id.btnRobbery);
         txtLatitude = (TextView) findViewById(R.id.txtLatitude);
         txtLongitude = (TextView) findViewById(R.id.txtLongitude);
+        txtaddress = (TextView) findViewById(R.id.txtaddress);
         realMAdapter = new RealMAdapter(getApplicationContext());
         userID = realMAdapter.getUserId();
 
@@ -221,6 +227,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void startRealtimeTrack(View view) {
+        btn_selected = view;
        /* LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.toast_layout,
                 (ViewGroup) findViewById(R.id.toast_layout_root));
@@ -243,7 +250,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         } else {
             startRealTimeTrack = true;
             btnKidnapClick.setBackgroundResource(android.R.color.holo_blue_light);
-
+            new VariableManager().customeToast(btn_selected,"Case Opened",1);
             // btnKidnapClick.setBackgroundResource(R.drawable.home_button_selected);
 
         }
@@ -255,7 +262,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void startStaticLocationTrack(View view) {
-        staticLocation = view;
+        btn_selected
+                = view;
         boolean isPass = true;
         Log.d("Accuracy", "Not");
         // while (isPass) {
@@ -285,6 +293,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         if (mLastLocation == null) {
             Log.d("Accuracy", "Not");
         }
+        //new AddressAsync().execute();
+        getUserAddress(mLastLocation.getLatitude(),mLastLocation.getLongitude());
         //}
 
     }
@@ -302,17 +312,19 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                             if (resposeJSON.names().get(0).equals("caseid")) {
                                 if (caseType == "K") {
                                     lastCaseId = resposeJSON.getInt("caseid");
-                                    new VariableManager().customeToast(staticLocation, "Case Opened", 1);
+
                                     //Toast.makeText(getApplicationContext(), "Last case id:" + lastCaseId, Toast.LENGTH_SHORT).show();
                                 } else {
-                                    new VariableManager().customeToast(staticLocation, "Case Opened", 1);
+                                    new VariableManager().customeToast(btn_selected
+                                            , "Case Opened", 1);
 
                                     //Toast.makeText(getApplicationContext(), "Last case id:" + lastCaseId, Toast.LENGTH_SHORT).show();
                                     lastCaseId = -1;
                                 }
                             }
                         } catch (Exception ex) {
-                            new VariableManager().customeToast(staticLocation, "Case Not Opened,Check Network", 0);
+                            new VariableManager().customeToast(btn_selected
+                                    , "Case Not Opened,Check Network", 0);
 
                         }
                     }
@@ -320,7 +332,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                     @Override
                     public void onErrorResponse(VolleyError error) {
 
-                       new VariableManager().customeToast(staticLocation,"Check Data Connection",0);
+                       new VariableManager().customeToast(btn_selected
+                               ,"Check Data Connection",0);
                     }
                 }) {
                     @Override
@@ -339,13 +352,73 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                 request.setRetryPolicy(new DefaultRetryPolicy(20000, 3, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                 queue.add(request);
             } catch (Exception ex) {
-                new VariableManager().customeToast(staticLocation, "Case Not Opened", 0);
+                new VariableManager().customeToast(btn_selected
+                        , "Case Not Opened", 0);
             }
             //Toast.makeText(MainActivity.this,"Finish",Toast.LENGTH_SHORT).show();
             return null;
         }
     }
 
+
+    public void getUserAddress(Double latitude,Double longitude){
+
+        StringRequest request = new StringRequest(Request.Method.GET,"https://maps.googleapis.com/maps/api/geocode/json?latlng="+latitude+","+longitude+"&key=AIzaSyD5S1_sclTRhSA2crRAdGLmJ-2Vp7dBajE", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject resposeJSON = new JSONObject(response);
+                    JSONArray jsonArray =  resposeJSON.getJSONArray("results");
+                    resposeJSON = jsonArray.getJSONObject(0);
+                    txtaddress.setText(resposeJSON.get("formatted_address").toString());
+                    //  resposeJSON = jsonArray.optJSONObject(0);
+                    Log.d("Address", resposeJSON.get("formatted_address").toString());
+                } catch (Exception ex) {
+                    Log.d("Address",ex.toString());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                new VariableManager().customeToast(btn_selected
+                        ,"Check Data Connection",0);
+            }
+        });
+        request.setRetryPolicy(new DefaultRetryPolicy(20000, 3, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(request);
+    }
+
+    public class AddressAsync extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            StringRequest request = new StringRequest(Request.Method.GET,"https://maps.googleapis.com/maps/api/geocode/json?latlng=6.9106853,79.9716076&key=AIzaSyD5S1_sclTRhSA2crRAdGLmJ-2Vp7dBajE", new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        JSONObject resposeJSON = new JSONObject(response);
+                        JSONArray jsonArray =  resposeJSON.getJSONArray("results");
+                        resposeJSON = jsonArray.getJSONObject(0);
+                      //  resposeJSON = jsonArray.optJSONObject(0);
+                        Log.d("Address", resposeJSON.get("formatted_address").toString());
+                    } catch (Exception ex) {
+
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    new VariableManager().customeToast(btn_selected
+                            ,"Check Data Connection",0);
+                }
+            });
+            request.setRetryPolicy(new DefaultRetryPolicy(20000, 3, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            queue.add(request);
+            return null;
+        }
+    }
 
 
 }

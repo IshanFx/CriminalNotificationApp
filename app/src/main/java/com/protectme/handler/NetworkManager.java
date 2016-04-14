@@ -27,7 +27,6 @@ public class NetworkManager {
     public static final String url_upload               = "http://"+hostIPPort+"/fileupload";
     public static String url_getOneCrime          = "http://"+hostIPPort+"/user/crime/";
 
-
     public static boolean checkNetwork(Context context){
         ConnectivityManager cm =
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
